@@ -1,20 +1,9 @@
-import Link from "next/link";
+import LoginForm from "./LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <h1>Log in</h1>
-        <p className="login-tagline">
-          Sign in to access your dream diary and archive.
-        </p>
-        <Link href="/diary" className="btn btn-primary btn-large">
-          Open diary
-        </Link>
-        <Link href="/" className="login-back">
-          ← Back to home
-        </Link>
-      </div>
+    <div className="login-body" style={{ minHeight: "100vh", padding: "2rem 1.5rem" }}>
+      <LoginForm />
     </div>
   );
 }

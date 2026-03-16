@@ -1,5 +1,5 @@
-import DiaryApp from "./DiaryApp";
+import DiaryGuard from "./DiaryGuard";
 
 export default function DiaryPage() {
-  return <DiaryApp />;
+  return <DiaryGuard />;
 }

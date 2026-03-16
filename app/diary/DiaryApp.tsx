@@ -1,6 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
+
 export default function DiaryApp() {
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "/app.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   return (
     <main className="diary" id="diary">
       <header className="diary-header">
@@ -61,9 +70,11 @@ export default function DiaryApp() {
       <section className="archive-section">
         <h2>Archive</h2>
         <div id="archive-list" className="archive-list">
-          {/* Dreams loaded from memory */}
+          {/* Filled by app.js */}
         </div>
       </section>
+
+      <div id="toast" className="toast" aria-live="polite" aria-hidden="true" />
     </main>
   );
 }
