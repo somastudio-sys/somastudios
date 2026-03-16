@@ -1,65 +1,205 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <>
+      <header className="site-header">
+        <div className="nav-bar">
+          <div className="nav-brand">
+            {/* Add your logo at public/assets/soma-studio-logo.png */}
+            <img
+              src="/assets/soma-studio-logo.png"
+              alt="Soma Studios logo"
+              className="nav-brand-logo"
+            />
+            <span>Soma Studios</span>
+          </div>
+          <nav className="nav-links">
+            <a href="#about">About us</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#products">Product</a>
+            <a href="#download">Download</a>
+          </nav>
+          <div className="nav-cta-group">
+            <Link href="/login" className="nav-login-link">
+              Log in
+            </Link>
+            <a href="#download" className="nav-download-btn">
+              Download
+            </a>
+          </div>
+        </div>
+
+        <section className="hero">
+          <div className="hero-copy">
+            <span className="hero-kicker">Dream diary · Freudian analysis</span>
+            <h1 className="hero-title">A softer home for your dreams.</h1>
+            <p className="hero-subtitle">
+              Capture what you see at night and return to it with gentle
+              Freudian insight.
+            </p>
+            <div className="hero-actions">
+              <a href="#download" className="btn btn-primary hero-primary">
+                Download Soma
+              </a>
+              <Link href="/diary" className="btn btn-ghost hero-secondary">
+                Log in to diary
+              </Link>
+            </div>
+            <p className="hero-meta">Available for desktop. Private by default.</p>
+          </div>
+          <div className="hero-visual" aria-hidden="true">
+            <div className="hero-window">
+              <div className="hero-window-bar">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="hero-window-body">
+                <div className="hero-window-placeholder">
+                  <img
+                    src="/assets/hero-diary-preview.png"
+                    alt="Preview of the Soma dream diary interface"
+                    className="hero-window-image"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </header>
+
+      <section id="about" className="info-section">
+        <div className="info-inner">
+          <h2>About us</h2>
+          <p className="about-copy">
+            Soma Studios is a small team building tools for dreamers. We believe
+            the things that surface at night deserve a gentle, private place to
+            land—and that returning to them with curiosity can bring clarity and
+            calm.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      <section id="products" className="product-section">
+        <div className="product-inner">
+          <header className="product-header">
+            <h2>Soma, in three moments</h2>
+            <p className="product-tagline">
+              A calm diary, a gentle analysis engine, and a private archive –
+              shown here as product previews.
+            </p>
+          </header>
+          <div
+            className="product-carousel"
+            aria-label="Soma product preview carousel"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
+            <figure className="product-card">
+              <div className="product-image-frame">
+                <img
+                  src="/assets/hero-diary-preview.png"
+                  alt="Preview of the Soma nightly diary entry surface"
+                />
+              </div>
+              <figcaption>
+                <h3>Nightly diary</h3>
+                <p>
+                  Capture what surfaced in the dark with a soft,
+                  distraction-free writing surface.
+                </p>
+              </figcaption>
+            </figure>
+            <figure className="product-card">
+              <div className="product-image-frame product-image-placeholder">
+                <span>Freudian analysis view</span>
+              </div>
+              <figcaption>
+                <h3>Freudian lens</h3>
+                <p>
+                  Return to your entries with gentle prompts drawn from classic
+                  psychoanalytic thinking.
+                </p>
+              </figcaption>
+            </figure>
+            <figure className="product-card">
+              <div className="product-image-frame product-image-placeholder">
+                <span>Private archive view</span>
+              </div>
+              <figcaption>
+                <h3>Private archive</h3>
+                <p>
+                  Keep an ordered, searchable record of dreams over months and
+                  years, just for you.
+                </p>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="testimonials"
+        className="info-section testimonials-section info-section--alt"
+      >
+        <div className="info-inner">
+          <h2>Customer testimonials</h2>
+          <div className="testimonial-carousel" aria-label="Customer testimonials">
+            <article className="testimonial-card">
+              <p className="testimonial-quote">
+                &ldquo;Soma gave my dreams somewhere gentle to land. It turned a
+                scattered notes app into a nightly ritual I actually look
+                forward to.&rdquo;
+              </p>
+              <p className="testimonial-name">Dreamer, London</p>
+            </article>
+            <article className="testimonial-card">
+              <p className="testimonial-quote">
+                &ldquo;The Freudian prompts helped me spot symbols and patterns
+                I&rsquo;d been circling for years. It feels like having a quiet
+                analyst in my pocket.&rdquo;
+              </p>
+              <p className="testimonial-name">Artist, Berlin</p>
+            </article>
+            <article className="testimonial-card">
+              <p className="testimonial-quote">
+                &ldquo;Revisiting old entries in Soma feels like screening a
+                private film of my subconscious. It&rsquo;s become the calmest
+                part of my evening.&rdquo;
+              </p>
+              <p className="testimonial-name">Writer, New York</p>
+            </article>
+            <article className="testimonial-card">
+              <p className="testimonial-quote">
+                &ldquo;I started recording dreams as an experiment. Soma turned
+                it into a practice that quietly anchors my week.&rdquo;
+              </p>
+              <p className="testimonial-name">Researcher, Toronto</p>
+            </article>
+            <article className="testimonial-card">
+              <p className="testimonial-quote">
+                &ldquo;There&rsquo;s something about seeing months of dreams in
+                one private place that makes my inner life feel held, not
+                chaotic.&rdquo;
+              </p>
+              <p className="testimonial-name">Designer, Copenhagen</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="download" className="download-section">
+        <div className="download-inner">
+          <h2>Download Soma</h2>
+          <p className="download-tagline">
+            Available for desktop. Private by default.
+          </p>
+          <a href="#download" className="btn btn-primary btn-large">
+            Download for Mac / Windows
           </a>
         </div>
-      </main>
-    </div>
+      </section>
+
+      <div id="toast" className="toast" aria-live="polite" />
+    </>
   );
 }
