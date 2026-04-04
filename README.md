@@ -41,6 +41,10 @@ Optional: set `OPENAI_MODEL` to another chat model if your account supports it. 
 
 **Story journey:** After you run **Analyse (Freud)** on a dream, use **Story journey** to pick a literary genre and build a choose-your-path short story from the dream and analysis (same `OPENAI_API_KEY`, `POST /api/story`).
 
+**Public journal (`/blog`):** Marketing posts for the product (edit `app/blog/MarketingBlogClient.tsx`).
+
+**Private repurposed stories (`/diary/stories`, login required):** After a story journey, **Save to my stories** stores fiction in `localStorage` under `soma-repurposed-stories` (browser-only, not synced).
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

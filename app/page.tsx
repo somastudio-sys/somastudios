@@ -18,6 +18,7 @@ export default function Home() {
             <a href="#about">About us</a>
             <a href="#testimonials">Testimonials</a>
             <a href="#products">Product</a>
+            <Link href="/blog">Blog</Link>
             <a href="#download">Download</a>
           </nav>
           <div className="nav-cta-group">

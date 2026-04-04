@@ -792,38 +792,129 @@ main.diary {
   overflow: hidden;
 }
 
-.dream-analysis {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
+.dream-card-analysis-note {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0;
+  line-height: 1.4;
+}
+
+/* Read full dream modal (full text + Freud analysis) */
+.dream-read-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 205;
+  background: rgba(5, 3, 20, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.dream-read-panel {
+  width: 100%;
+  max-width: 40rem;
+  margin: 2rem auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.5rem 1.25rem;
+  color: var(--text);
+}
+
+.dream-read-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dream-read-heading {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.dream-read-close {
+  font-size: 1.75rem;
+  line-height: 1;
+  padding: 0 0.35rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.dream-read-close:hover {
+  color: var(--text);
+}
+
+.dream-read-date {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0.35rem 0 1rem;
+}
+
+.dream-read-body {
+  max-height: min(55vh, 32rem);
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.dream-read-section-title {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 1rem 0 0.5rem;
+}
+
+.dream-read-section-title:first-child {
+  margin-top: 0;
+}
+
+.dream-read-section-freud {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
   border-top: 1px solid var(--border);
 }
 
-.toggle-analysis {
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--accent);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem 0;
-  text-align: left;
-}
-
-.toggle-analysis:hover {
-  text-decoration: underline;
-}
-
-.dream-analysis-text {
+.dream-read-dream-text {
   font-family: var(--font-serif);
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.dream-read-analysis-text {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.65;
   color: var(--text-muted);
-  margin-top: 0.5rem;
-  padding: 0.75rem;
+  white-space: pre-wrap;
+  padding: 0.85rem;
   background: rgba(15, 12, 22, 0.5);
   border-radius: 8px;
-  white-space: pre-wrap;
+}
+
+.dream-read-footer {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
 }
 
 .dream-card-actions {
@@ -1036,37 +1127,6 @@ main.diary {
   border-top: 1px solid var(--border);
 }
 
-details.dream-analysis {
-  margin-top: 0.75rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border);
-}
-
-details.dream-analysis summary.toggle-analysis {
-  cursor: pointer;
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--accent);
-  list-style: none;
-}
-
-details.dream-analysis summary::-webkit-details-marker {
-  display: none;
-}
-
-details.dream-analysis .dream-analysis-text {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background: rgba(15, 12, 22, 0.5);
-  border-radius: 8px;
-  white-space: pre-wrap;
-  font-family: var(--font-serif);
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: var(--text-muted);
-}
-
 .empty-archive {
   text-align: center;
   padding: 2rem;
@@ -1206,6 +1266,453 @@ details.dream-analysis .dream-analysis-text {
   font-size: 0.875rem;
   color: var(--record-on);
   margin: 0 0 0.5rem;
+}
+
+/* Diary → blog link */
+.diary-blog-link {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+}
+
+.diary-blog-link a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.diary-blog-link a:hover {
+  text-decoration: underline;
+}
+
+/* Publish story to blog (modal) */
+.story-publish-block {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.story-publish-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.story-publish-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(15, 12, 22, 0.4);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.story-publish-input:focus {
+  outline: none;
+  border-color: var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.story-publish-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.story-view-blog-link {
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.story-view-blog-link:hover {
+  text-decoration: underline;
+}
+
+/* Public blog page */
+.blog-page {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  color: var(--text);
+}
+
+.blog-header {
+  padding: 2rem 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    transparent 100%
+  );
+}
+
+.blog-header-inner {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.blog-back {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.blog-back:hover {
+  color: var(--accent);
+}
+
+.blog-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+  color: var(--text);
+}
+
+.blog-lede {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.blog-main {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.blog-empty {
+  text-align: center;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.blog-empty-hint {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.blog-empty-hint a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.blog-empty-hint a:hover {
+  text-decoration: underline;
+}
+
+.blog-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+.blog-article-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.75rem;
+  box-shadow: var(--shadow);
+}
+
+.blog-article-meta h2 {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.blog-article-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.blog-genre-tag {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.blog-article-body {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.blog-article-body p {
+  margin: 0 0 1rem;
+}
+
+.blog-article-body p:last-child {
+  margin-bottom: 0;
+}
+
+.blog-article-actions {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.blog-remove-btn {
+  font-size: 0.85rem;
+}
+
+/* Private repurposed stories (/diary/stories, behind login) */
+.private-stories-page {
+  min-height: 100vh;
+  padding-bottom: 3rem;
+}
+
+.private-stories-header {
+  padding: 1.5rem 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.private-stories-header-inner {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.private-stories-back {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.private-stories-back:hover {
+  color: var(--accent);
+}
+
+.private-stories-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+  color: var(--text);
+}
+
+.private-stories-lede {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.private-stories-main {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 2rem;
+}
+
+.private-stories-empty {
+  text-align: center;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.private-stories-hint {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.private-stories-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.private-stories-card {
+  background: rgba(13, 8, 29, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.75rem;
+}
+
+.private-stories-meta h2 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.private-stories-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.private-stories-genre {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--text);
+  font-size: 0.8rem;
+}
+
+.private-stories-body {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.private-stories-body p {
+  margin: 0 0 1rem;
+}
+
+.private-stories-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.private-stories-remove {
+  font-size: 0.85rem;
+}
+
+/* Public marketing journal (/blog) */
+.marketing-blog {
+  min-height: 100vh;
+  background: var(--bg-deep);
+  color: var(--text);
+}
+
+.marketing-blog-hero {
+  padding: 2rem 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.55) 0%,
+    transparent 100%
+  );
+}
+
+.marketing-blog-hero-inner {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+
+.marketing-blog-back {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.marketing-blog-back:hover {
+  color: var(--accent);
+}
+
+.marketing-blog-h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+  color: var(--text);
+}
+
+.marketing-blog-dek {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.marketing-blog-main {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.marketing-post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.marketing-post {
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.marketing-post:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.marketing-post-date {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0 0 0.35rem;
+}
+
+.marketing-post-header h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.65rem;
+  color: var(--text);
+}
+
+.marketing-post-excerpt {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0 0 1rem;
+}
+
+.marketing-post-body {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--text);
+}
+
+.marketing-post-body p {
+  margin: 0 0 1rem;
+}
+
+.marketing-post-body p:last-child {
+  margin-bottom: 0;
+}
+
+.marketing-blog-cta {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.marketing-blog-cta .btn-primary {
+  text-decoration: none;
+  display: inline-flex;
 }
 
 @media (max-width: 480px) {

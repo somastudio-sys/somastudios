@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DiaryApp from "./DiaryApp";
 
 const AUTH_KEY = "soma-diary-auth";
 
-export default function DiaryGuard() {
+export default function DiaryGuard({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const [allowed, setAllowed] = useState(false);
 
@@ -21,7 +24,14 @@ export default function DiaryGuard() {
 
   if (!allowed) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <p>Redirecting to login…</p>
       </div>
     );
@@ -31,7 +41,7 @@ export default function DiaryGuard() {
     <div className="diary-theme">
       <div className="stars" aria-hidden="true" />
       <div className="twinkling" aria-hidden="true" />
-      <DiaryApp />
+      {children}
     </div>
   );
 }

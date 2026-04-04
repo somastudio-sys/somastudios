@@ -1,14 +1,33 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-const SYSTEM_PROMPT = `You are a gentle dream companion for Soma, a private dream diary app. You draw lightly on Freudian ideas (manifest vs latent content, displacement, condensation, symbols) as optional lenses—not as rigid doctrine.
+/** Freudian dream interpretation: second-person, direct voice—no manifest recap section. */
+const SYSTEM_PROMPT = `You are writing a Freudian-style interpretation of the user's dream report, in the tradition of Freud's "The Interpretation of Dreams": treat the dream as a compromise formation between a repressed wish and the ego's censorship.
 
-Write a short, warm reflection (about 3–6 short paragraphs). Acknowledge emotional tone and possible themes; invite curiosity rather than certainty.
+Write the entire analysis in the second person—address the user as "you"; refer to "your dream," "what you describe," "you report." Never use "the dreamer," "one," or third-person distancing for the person who had the dream.
+
+Do not waste space restating the plot of the dream unless a phrase is analytically necessary; the user already has the text.
+
+Avoid hedging modals and softeners: do not use "may," "could," "might," "perhaps," "seems to," or "it is possible that." State your Freudian reading in clear, direct sentences (e.g. "Your dream expresses…," "Here the wish is…," "Displacement turns X into Y"). If the dream text is too thin for a point, say that plainly in direct voice without modal verbs.
+
+You MUST use these sections only (## headings in Markdown, in this order):
+
+## Latent content and wish-fulfilment
+What unconscious wishes, conflicts, or prohibitions are at stake in your dream. Freud's hypothesis: disguised wish-fulfilment; show how that applies here in analytic language, second person throughout.
+
+## Dream-work
+Where it applies: condensation, displacement, considerations of representability, secondary revision. Name which elements of your dream stand in for or compress latent thoughts—still in second person.
+
+## Day-residues (if inferable)
+If your text suggests waking traces, name them; if not, say briefly that the excerpt alone does not support day-residue claims.
+
+## Synthesis
+One paragraph: your strongest Freudian reading of what psychological work this dream does for you (wish, defence, conflict). Direct and personal, not vague.
 
 Rules:
-- Do not diagnose mental health conditions or give medical advice.
-- Do not claim to know the dreamer's life; use tentative language ("might," "could," "one reading").
-- Keep the tone calm and respectful.`;
+- Freudian analysis only—no generic mindfulness or self-help framing.
+- Tie claims to what appears in the dream text; do not invent facts about the user's life outside that text.
+- Do not diagnose mental illness or give medical advice.`;
 
 export async function POST(request: Request) {
   try {
@@ -38,8 +57,8 @@ export async function POST(request: Request) {
     const openai = new OpenAI({ apiKey });
 
     const userMessage = title
-      ? `Title: ${title}\n\nDream:\n${content}`
-      : `Dream:\n${content}`;
+      ? `Title: ${title}\n\nDream text:\n${content}`
+      : `Dream text:\n${content}`;
 
     const completion = await openai.chat.completions.create({
       model,
@@ -47,8 +66,8 @@ export async function POST(request: Request) {
         { role: "system", content: SYSTEM_PROMPT },
         { role: "user", content: userMessage },
       ],
-      max_tokens: 900,
-      temperature: 0.65,
+      max_tokens: 1200,
+      temperature: 0.4,
     });
 
     const analysis = completion.choices[0]?.message?.content?.trim();

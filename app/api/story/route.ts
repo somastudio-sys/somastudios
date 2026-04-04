@@ -8,7 +8,8 @@ Schema:
  "choices": string[] }
 
 Rules:
-- "choices" must be exactly 3 short labels (under 12 words each) for what could happen next, OR an empty array [] if the story arc feels naturally complete.
+- The interactive story runs for at most three branching rounds after the opening segment (three "what happens next?" screens), then it must end—unless the user message explicitly marks the final segment.
+- "choices" must be exactly 3 short labels (under 12 words each) for what could happen next. On the final segment request, return an empty choices array [].
 - Match the literary genre the user asked for (voice, imagery, pacing).
 - Do not copy the dream verbatim; transform and dramatise it.
 - No graphic sexual or gratuitous violence; keep a thoughtful, literary tone.`;
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
       typeof body.storySoFar === "string" ? body.storySoFar.trim() : "";
     const choice =
       typeof body.choice === "string" ? body.choice.trim() : "";
+    const finalSegment = body.finalSegment === true;
 
     if (!dreamContent) {
       return NextResponse.json(
@@ -85,7 +87,9 @@ export async function POST(request: Request) {
         "",
         `The reader chose: "${choice}"`,
         "",
-        "Continue with the next segment. Return JSON with \"segment\" and \"choices\" (3 strings, or empty array to end).",
+        finalSegment
+          ? "This is the FINAL segment of a short branching story (the reader has already made three path choices). Bring the plot to a satisfying close. Return JSON with \"segment\" and \"choices\": [] — an empty array only, no further branches."
+          : "Continue with the next segment. Return JSON with \"segment\" and \"choices\" (exactly 3 short strings for what could happen next).",
       ].join("\n");
     }
 
@@ -119,9 +123,12 @@ export async function POST(request: Request) {
     }
 
     const segment = typeof parsed.segment === "string" ? parsed.segment.trim() : "";
-    const choices = Array.isArray(parsed.choices)
+    let choices = Array.isArray(parsed.choices)
       ? parsed.choices.filter((c) => typeof c === "string").slice(0, 3)
       : [];
+    if (mode === "continue" && finalSegment) {
+      choices = [];
+    }
 
     if (!segment) {
       return NextResponse.json(

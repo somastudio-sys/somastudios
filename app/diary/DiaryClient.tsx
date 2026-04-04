@@ -1,6 +1,9 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { addPrivateStory } from "@/lib/privateStoriesStorage";
 import type { DreamEntry } from "./types";
 import { STORAGE_KEY } from "./types";
 
@@ -26,6 +29,9 @@ const GENRES: { id: string; label: string }[] = [
   { id: "myth", label: "Myth / fable" },
 ];
 
+/** After the opening, the reader gets this many "what happens next?" screens, then the story ends. */
+const MAX_STORY_CHOICE_ROUNDS = 3;
+
 function loadEntries(): DreamEntry[] {
   if (typeof window === "undefined") return [];
   try {
@@ -41,6 +47,7 @@ function saveEntries(entries: DreamEntry[]) {
 }
 
 export default function DiaryClient() {
+  const router = useRouter();
   const [entries, setEntries] = useState<DreamEntry[]>([]);
   const [dreamDate, setDreamDate] = useState("");
   const [dreamTitle, setDreamTitle] = useState("");
@@ -58,7 +65,9 @@ export default function DiaryClient() {
   const [storyLog, setStoryLog] = useState<string[]>([]);
   const [storyChoices, setStoryChoices] = useState<string[]>([]);
   const [storyEnded, setStoryEnded] = useState(false);
+  const [publishTitle, setPublishTitle] = useState("");
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+  const [dreamReadModal, setDreamReadModal] = useState<DreamEntry | null>(null);
 
   const showToast = useCallback((message: string, type?: string) => {
     setToast({ message, type });
@@ -70,6 +79,15 @@ export default function DiaryClient() {
     setEntries(loadEntries());
     setDreamDate(new Date().toISOString().slice(0, 10));
   }, []);
+
+  useEffect(() => {
+    if (!dreamReadModal) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDreamReadModal(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [dreamReadModal]);
 
   const persist = useCallback((next: DreamEntry[]) => {
     setEntries(next);
@@ -117,6 +135,12 @@ export default function DiaryClient() {
     setDreamDate(dream.date);
     setDreamContent(dream.content);
     showToast("Dream loaded into editor. You can edit and save again.");
+  };
+
+  const loadIntoEditorFromReadModal = () => {
+    if (!dreamReadModal) return;
+    loadIntoEditor(dreamReadModal);
+    setDreamReadModal(null);
   };
 
   const analyzeDream = async (dream: DreamEntry) => {
@@ -232,6 +256,7 @@ export default function DiaryClient() {
     setStoryLog([]);
     setStoryChoices([]);
     setStoryEnded(false);
+    setPublishTitle("");
   };
 
   const closeStory = () => {
@@ -241,6 +266,24 @@ export default function DiaryClient() {
     setStoryChoices([]);
     setStoryEnded(false);
     setStoryLoading(false);
+    setPublishTitle("");
+  };
+
+  const saveStoryPrivate = () => {
+    if (!storyDream || !storyGenre || storyLog.length === 0) return;
+    const body = storyLog.join("\n\n").trim();
+    if (!body) return;
+    const defaultTitle = `${storyDream.title || "Untitled dream"} · ${storyGenre}`;
+    addPrivateStory({
+      title: publishTitle.trim() || defaultTitle,
+      genre: storyGenre,
+      dreamId: storyDream.id,
+      body,
+    });
+    showToast("Saved — opening your stories.", "success");
+    setPublishTitle("");
+    closeStory();
+    router.push("/diary/stories");
   };
 
   const storySoFarText = storyLog.join("\n\n");
@@ -281,6 +324,7 @@ export default function DiaryClient() {
 
   const continueStory = async (choice: string) => {
     if (!storyDream || !storyGenre) return;
+    const finalSegment = storyLog.length >= MAX_STORY_CHOICE_ROUNDS;
     setStoryLoading(true);
     try {
       const res = await fetch("/api/story", {
@@ -294,6 +338,7 @@ export default function DiaryClient() {
           analysis: storyDream.freudAnalysis,
           storySoFar: storySoFarText,
           choice,
+          finalSegment,
         }),
       });
       const data = (await res.json()) as {
@@ -303,9 +348,14 @@ export default function DiaryClient() {
       };
       if (!res.ok) throw new Error(data.error || "Story failed");
       setStoryLog((prev) => [...prev, data.segment || ""]);
-      const next = data.choices?.length ? data.choices : [];
-      setStoryChoices(next);
-      setStoryEnded(next.length === 0);
+      if (finalSegment) {
+        setStoryChoices([]);
+        setStoryEnded(true);
+      } else {
+        const next = data.choices?.length ? data.choices : [];
+        setStoryChoices(next);
+        setStoryEnded(next.length === 0);
+      }
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Story failed.");
     } finally {
@@ -324,6 +374,9 @@ export default function DiaryClient() {
           <h2>Your nightly entries</h2>
           <p className="tagline">
             Capture and recreate the things that disturb you at night.
+          </p>
+          <p className="diary-blog-link">
+            <Link href="/diary/stories">My repurposed stories →</Link>
           </p>
         </header>
 
@@ -422,17 +475,16 @@ export default function DiaryClient() {
                       <time className="dream-card-date">{dateStr}</time>
                     </div>
                     <p className="dream-card-content">{short}</p>
-                    {dream.freudAnalysis && (
-                      <details className="dream-analysis">
-                        <summary className="toggle-analysis">Freud analysis</summary>
-                        <div className="dream-analysis-text">{dream.freudAnalysis}</div>
-                      </details>
-                    )}
+                    {dream.freudAnalysis ? (
+                      <p className="dream-card-analysis-note">
+                        Freud analysis included — open with Read full.
+                      </p>
+                    ) : null}
                     <div className="dream-card-actions">
                       <button
                         type="button"
                         className="expand"
-                        onClick={() => loadIntoEditor(dream)}
+                        onClick={() => setDreamReadModal(dream)}
                       >
                         Read full
                       </button>
@@ -485,6 +537,74 @@ export default function DiaryClient() {
         </div>
       </main>
 
+      {dreamReadModal && (
+        <div
+          className="dream-read-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dream-read-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDreamReadModal(null);
+          }}
+        >
+          <div className="dream-read-panel">
+            <div className="dream-read-header">
+              <h2 id="dream-read-title" className="dream-read-heading">
+                {dreamReadModal.title || "Untitled dream"}
+              </h2>
+              <button
+                type="button"
+                className="dream-read-close"
+                onClick={() => setDreamReadModal(null)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+            <time
+              className="dream-read-date"
+              dateTime={dreamReadModal.date}
+            >
+              {new Date(dreamReadModal.date).toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </time>
+            <div className="dream-read-body">
+              <h3 className="dream-read-section-title">Dream</h3>
+              <div className="dream-read-dream-text">{dreamReadModal.content}</div>
+              {dreamReadModal.freudAnalysis ? (
+                <>
+                  <h3 className="dream-read-section-title dream-read-section-freud">
+                    Freud analysis
+                  </h3>
+                  <div className="dream-read-analysis-text">
+                    {dreamReadModal.freudAnalysis}
+                  </div>
+                </>
+              ) : null}
+            </div>
+            <div className="dream-read-footer">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={loadIntoEditorFromReadModal}
+              >
+                Load into editor
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setDreamReadModal(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {storyDream && (
         <div
           className="story-journey-backdrop"
@@ -507,7 +627,8 @@ export default function DiaryClient() {
             <p className="story-journey-sub">
               From your dream
               {storyDream.title ? ` “${storyDream.title}”` : ""}. Pick a genre,
-              then choose paths to shape the tale.
+              then branch up to {MAX_STORY_CHOICE_ROUNDS} times (three options
+              each time)—then the story closes.
             </p>
 
             {!storyGenre ? (
@@ -573,6 +694,36 @@ export default function DiaryClient() {
 
             {storyEnded && storyLog.length > 0 && !storyLoading && (
               <p className="story-the-end">The end — or close and try another path.</p>
+            )}
+
+            {storyLog.length > 0 && !storyLoading && (
+              <div className="story-publish-block">
+                <label className="story-publish-label" htmlFor="story-save-title">
+                  Story title (optional)
+                </label>
+                <input
+                  id="story-save-title"
+                  type="text"
+                  className="story-publish-input"
+                  placeholder={
+                    storyDream?.title
+                      ? `${storyDream.title} · ${storyGenre ?? ""}`
+                      : "Give this piece a title"
+                  }
+                  value={publishTitle}
+                  onChange={(e) => setPublishTitle(e.target.value)}
+                  maxLength={120}
+                />
+                <div className="story-publish-actions">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={saveStoryPrivate}
+                  >
+                    Save to my stories
+                  </button>
+                </div>
+              </div>
             )}
 
             <div className="story-journey-footer">
