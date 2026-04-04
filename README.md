@@ -29,6 +29,18 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Dream analysis (OpenAI)
+
+The diary’s **Analyse (Freud)** button calls `POST /api/analyze`, which uses the OpenAI API on the server only (your key is never sent to the browser).
+
+1. Create an API key at [OpenAI API keys](https://platform.openai.com/api-keys).
+2. **Local:** copy `.env.example` to `.env.local`, set `OPENAI_API_KEY=sk-...`, restart `npm run dev`.
+3. **Vercel:** Project → Settings → Environment Variables → add `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`, default `gpt-4o-mini`). Redeploy.
+
+Optional: set `OPENAI_MODEL` to another chat model if your account supports it. In the OpenAI dashboard you can set usage limits and budgets.
+
+**Story journey:** After you run **Analyse (Freud)** on a dream, use **Story journey** to pick a literary genre and build a choose-your-path short story from the dream and analysis (same `OPENAI_API_KEY`, `POST /api/story`).
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

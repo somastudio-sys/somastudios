@@ -831,6 +831,7 @@ main.diary {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 .dream-card-actions button {
@@ -863,6 +864,207 @@ main.diary {
 .dream-card-actions button.delete:hover {
   color: var(--record-on);
   border-color: var(--record-on);
+}
+
+.dream-card-actions button.story-journey {
+  color: var(--accent);
+  border-color: rgba(201, 160, 220, 0.5);
+}
+
+.dream-card-actions button.story-journey:hover {
+  color: #f7f3ff;
+  border-color: var(--accent);
+}
+
+/* Story journey modal */
+.story-journey-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(5, 3, 20, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.story-journey-panel {
+  width: 100%;
+  max-width: 40rem;
+  margin: 2rem auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem 1.5rem 1.25rem;
+  color: var(--text);
+}
+
+.story-journey-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.story-journey-header h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.story-journey-close {
+  font-size: 1.75rem;
+  line-height: 1;
+  padding: 0 0.35rem;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.story-journey-close:hover {
+  color: var(--text);
+}
+
+.story-journey-sub {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0.75rem 0 1rem;
+}
+
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.genre-chip {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(15, 12, 22, 0.4);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.genre-chip:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.story-genre-pill {
+  font-size: 0.88rem;
+  color: var(--accent);
+  margin: 0 0 0.75rem;
+}
+
+.story-begin-btn {
+  margin-bottom: 1rem;
+}
+
+.story-loading {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0.5rem 0;
+}
+
+.story-segments {
+  max-height: min(50vh, 28rem);
+  overflow-y: auto;
+  margin: 1rem 0;
+  padding-right: 0.35rem;
+}
+
+.story-segment-block {
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+  color: var(--text);
+}
+
+.story-segment-block p {
+  margin: 0 0 0.65rem;
+}
+
+.story-choices {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.story-choices-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.story-choice-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.story-choice-btn {
+  text-align: left;
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.story-the-end {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--text-muted);
+  margin: 1rem 0 0;
+}
+
+.story-journey-footer {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+details.dream-analysis {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+details.dream-analysis summary.toggle-analysis {
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--accent);
+  list-style: none;
+}
+
+details.dream-analysis summary::-webkit-details-marker {
+  display: none;
+}
+
+details.dream-analysis .dream-analysis-text {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(15, 12, 22, 0.5);
+  border-radius: 8px;
+  white-space: pre-wrap;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-muted);
 }
 
 .empty-archive {
