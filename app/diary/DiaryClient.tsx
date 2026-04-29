@@ -61,6 +61,7 @@ export default function DiaryClient() {
 
   const [storyDream, setStoryDream] = useState<DreamEntry | null>(null);
   const [storyGenre, setStoryGenre] = useState<string | null>(null);
+  const [storyGenreId, setStoryGenreId] = useState<string | null>(null);
   const [storyLoading, setStoryLoading] = useState(false);
   const [storyLog, setStoryLog] = useState<string[]>([]);
   const [storyChoices, setStoryChoices] = useState<string[]>([]);
@@ -253,6 +254,7 @@ export default function DiaryClient() {
     }
     setStoryDream(dream);
     setStoryGenre(null);
+    setStoryGenreId(null);
     setStoryLog([]);
     setStoryChoices([]);
     setStoryEnded(false);
@@ -262,6 +264,7 @@ export default function DiaryClient() {
   const closeStory = () => {
     setStoryDream(null);
     setStoryGenre(null);
+    setStoryGenreId(null);
     setStoryLog([]);
     setStoryChoices([]);
     setStoryEnded(false);
@@ -274,16 +277,16 @@ export default function DiaryClient() {
     const body = storyLog.join("\n\n").trim();
     if (!body) return;
     const defaultTitle = `${storyDream.title || "Untitled dream"} · ${storyGenre}`;
-    addPrivateStory({
+    const saved = addPrivateStory({
       title: publishTitle.trim() || defaultTitle,
       genre: storyGenre,
       dreamId: storyDream.id,
       body,
     });
-    showToast("Saved — opening your stories.", "success");
+    showToast("Saved — opening your story.", "success");
     setPublishTitle("");
     closeStory();
-    router.push("/diary/stories");
+    router.push(`/diary/stories/${encodeURIComponent(saved.id)}`);
   };
 
   const storySoFarText = storyLog.join("\n\n");
@@ -301,6 +304,7 @@ export default function DiaryClient() {
         body: JSON.stringify({
           mode: "start",
           genre: storyGenre,
+          genreId: storyGenreId ?? undefined,
           dreamContent: storyDream.content,
           dreamTitle: storyDream.title,
           analysis: storyDream.freudAnalysis,
@@ -333,6 +337,7 @@ export default function DiaryClient() {
         body: JSON.stringify({
           mode: "continue",
           genre: storyGenre,
+          genreId: storyGenreId ?? undefined,
           dreamContent: storyDream.content,
           dreamTitle: storyDream.title,
           analysis: storyDream.freudAnalysis,
@@ -367,6 +372,11 @@ export default function DiaryClient() {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
+  const analyzingDream =
+    analyzingId == null
+      ? null
+      : sorted.find((d) => d.id === analyzingId) ?? null;
+
   return (
     <>
       <main className="diary" id="diary">
@@ -379,6 +389,26 @@ export default function DiaryClient() {
             <Link href="/diary/stories">My repurposed stories →</Link>
           </p>
         </header>
+
+        {analyzingDream ? (
+          <div
+            className="analysis-status-banner"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
+            <span className="analysis-spinner" aria-hidden="true" />
+            <div className="analysis-status-copy">
+              <p className="analysis-status-title">Analysing your dream</p>
+              <p className="analysis-status-meta">
+                {analyzingDream.title
+                  ? `“${analyzingDream.title}”`
+                  : "Untitled dream"}{" "}
+                · Freudian reflection can take a little while—please wait.
+              </p>
+            </div>
+          </div>
+        ) : null}
 
         <section className="entry-section">
           <div className="entry-toolbar">
@@ -457,48 +487,40 @@ export default function DiaryClient() {
             ) : (
               sorted.map((dream) => {
                 const title = dream.title || "Untitled dream";
-                const dateStr = new Date(dream.date).toLocaleDateString(
-                  undefined,
-                  {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                  }
-                );
-                const short =
-                  dream.content.slice(0, 180) +
-                  (dream.content.length > 180 ? "…" : "");
                 return (
-                  <article key={dream.id} className="dream-card" data-id={dream.id}>
-                    <div className="dream-card-header">
-                      <h3 className="dream-card-title">{title}</h3>
-                      <time className="dream-card-date">{dateStr}</time>
-                    </div>
-                    <p className="dream-card-content">{short}</p>
-                    {dream.freudAnalysis ? (
-                      <p className="dream-card-analysis-note">
-                        Freud analysis included — open with Read full.
-                      </p>
-                    ) : null}
+                  <article
+                    key={dream.id}
+                    className={`dream-card${analyzingId === dream.id ? " dream-card--analysing" : ""}`}
+                    data-id={dream.id}
+                  >
+                    <h3 className="dream-card-title">{title}</h3>
                     <div className="dream-card-actions">
                       <button
                         type="button"
                         className="expand"
                         onClick={() => setDreamReadModal(dream)}
                       >
-                        Read full
+                        View
                       </button>
                       <button
                         type="button"
-                        className="analyze"
+                        className={`analyze${analyzingId === dream.id ? " analyze--busy" : ""}`}
                         disabled={analyzingId === dream.id}
                         onClick={() => runAnalyze(dream.id)}
                       >
-                        {analyzingId === dream.id
-                          ? "Analysing…"
-                          : dream.freudAnalysis
-                            ? "Re-analyse"
-                            : "Analyse (Freud)"}
+                        {analyzingId === dream.id ? (
+                          <>
+                            <span
+                              className="btn-inline-spinner"
+                              aria-hidden="true"
+                            />
+                            Analysing…
+                          </>
+                        ) : dream.freudAnalysis ? (
+                          "Re-analyse"
+                        ) : (
+                          "Analyse (Freud)"
+                        )}
                       </button>
                       <button
                         type="button"
@@ -638,7 +660,10 @@ export default function DiaryClient() {
                     key={g.id}
                     type="button"
                     className="genre-chip"
-                    onClick={() => setStoryGenre(g.label)}
+                    onClick={() => {
+                      setStoryGenre(g.label);
+                      setStoryGenreId(g.id);
+                    }}
                   >
                     {g.label}
                   </button>

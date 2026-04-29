@@ -1,4 +1,6 @@
 import Link from "next/link";
+import SiteFooter from "@/components/SiteFooter";
+import SiteNav from "@/components/SiteNav";
 
 const POSTS = [
   {
@@ -75,15 +77,15 @@ const POSTS = [
 export default function MarketingBlogClient() {
   return (
     <div className="marketing-blog">
+      <header className="site-header site-header--page">
+        <SiteNav variant="inner" />
+      </header>
       <header className="marketing-blog-hero">
         <div className="marketing-blog-hero-inner">
-          <Link href="/" className="marketing-blog-back">
-            ← Soma Studios
-          </Link>
           <h1 className="marketing-blog-h1">Journal</h1>
           <p className="marketing-blog-dek">
             Ideas, updates, and how we think about dreams and creativity—so you
-            can see what Soma stands for before you download.
+            can see what Soma stands for before you open the diary.
           </p>
         </div>
       </header>
@@ -105,11 +107,12 @@ export default function MarketingBlogClient() {
         </ul>
 
         <p className="marketing-blog-cta">
-          <Link href="/#download" className="btn btn-primary">
-            Get Soma
+          <Link href="/login" className="btn btn-primary">
+            Log in to diary
           </Link>
         </p>
       </main>
+      <SiteFooter />
     </div>
   );
 }

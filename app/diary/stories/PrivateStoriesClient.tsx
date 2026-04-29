@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import type { RepurposedStory } from "@/lib/privateStoriesStorage";
 import {
   deletePrivateStory,
   loadPrivateStories,
 } from "@/lib/privateStoriesStorage";
+
+function storyExcerpt(body: string, max = 140): string {
+  const line = body.replace(/\s+/g, " ").trim();
+  if (line.length <= max) return line;
+  return `${line.slice(0, max).trim()}…`;
+}
 
 export default function PrivateStoriesClient() {
   const [stories, setStories] = useState<RepurposedStory[]>([]);
@@ -21,7 +27,9 @@ export default function PrivateStoriesClient() {
     refresh();
   }, [refresh]);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string, e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!confirm("Remove this story from your private collection?")) return;
     deletePrivateStory(id);
     refresh();
@@ -41,7 +49,7 @@ export default function PrivateStoriesClient() {
           <h1 className="private-stories-title">My repurposed stories</h1>
           <p className="private-stories-lede">
             Story journeys you’ve saved from your dreams—private to this
-            browser, only visible after login.
+            browser, only visible after login. Open a story to read it in full.
           </p>
         </div>
       </header>
@@ -58,39 +66,35 @@ export default function PrivateStoriesClient() {
             </p>
           </div>
         ) : (
-          <ul className="private-stories-list">
+          <ul className="private-stories-list private-stories-list-compact">
             {sorted.map((story) => {
               const date = new Date(story.createdAt).toLocaleDateString(
                 undefined,
                 {
                   year: "numeric",
-                  month: "long",
+                  month: "short",
                   day: "numeric",
                 }
               );
+              const href = `/diary/stories/${encodeURIComponent(story.id)}`;
               return (
-                <li key={story.id} className="private-stories-card">
-                  <header className="private-stories-meta">
-                    <h2>{story.title}</h2>
-                    <div className="private-stories-sub">
+                <li key={story.id} className="private-stories-row">
+                  <Link href={href} className="private-stories-row-link">
+                    <h2 className="private-stories-row-title">{story.title}</h2>
+                    <div className="private-stories-sub private-stories-row-sub">
                       <span className="private-stories-genre">{story.genre}</span>
                       <time dateTime={story.createdAt}>{date}</time>
                     </div>
-                  </header>
-                  <article className="private-stories-body">
-                    {story.body.split("\n\n").map((para, i) => (
-                      <p key={i}>{para}</p>
-                    ))}
-                  </article>
-                  <div className="private-stories-actions">
-                    <button
-                      type="button"
-                      className="btn btn-ghost private-stories-remove"
-                      onClick={() => handleDelete(story.id)}
-                    >
-                      Remove
-                    </button>
-                  </div>
+                    <p className="private-stories-excerpt">{storyExcerpt(story.body)}</p>
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn btn-ghost private-stories-remove private-stories-row-remove"
+                    onClick={(e) => handleDelete(story.id, e)}
+                    aria-label={`Remove “${story.title}”`}
+                  >
+                    Remove
+                  </button>
                 </li>
               );
             })}

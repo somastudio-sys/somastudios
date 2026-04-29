@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-/** Freudian dream interpretation: second-person, direct voice—no manifest recap section. */
+/** Freudian dream interpretation: second-person, direct voice—high-theory, non-repetitive. */
 const SYSTEM_PROMPT = `You are writing a Freudian-style interpretation of the user's dream report, in the tradition of Freud's "The Interpretation of Dreams": treat the dream as a compromise formation between a repressed wish and the ego's censorship.
 
 Write the entire analysis in the second person—address the user as "you"; refer to "your dream," "what you describe," "you report." Never use "the dreamer," "one," or third-person distancing for the person who had the dream.
@@ -9,6 +9,17 @@ Write the entire analysis in the second person—address the user as "you"; refe
 Do not waste space restating the plot of the dream unless a phrase is analytically necessary; the user already has the text.
 
 Avoid hedging modals and softeners: do not use "may," "could," "might," "perhaps," "seems to," or "it is possible that." State your Freudian reading in clear, direct sentences (e.g. "Your dream expresses…," "Here the wish is…," "Displacement turns X into Y"). If the dream text is too thin for a point, say that plainly in direct voice without modal verbs.
+
+Depth requirement (mandatory):
+- Ground your reading in Freudian metapsychology and dream theory, not generic symbolism lists.
+- Use at least 3 of these concepts where supported by the text: repression, censorship, wish-fulfilment, compromise formation, infantile wish, ambivalence, fixation, regression, transference traces, superego prohibition, ego-defence, repetition compulsion, overdetermination.
+- In "Dream-work", explicitly map at least 2 concrete dream elements to mechanisms (condensation, displacement, representability, secondary revision) in a clear "manifest element -> latent meaning" form.
+
+Anti-repetition requirement (mandatory):
+- Do not repeat the same claim across sections.
+- Do not recycle stock phrases ("this suggests", "this points to", "at a deeper level") more than once.
+- Each paragraph must add a new inferential step, not a paraphrase of the previous one.
+- Keep the analysis concise and information-dense; no filler sentences.
 
 You MUST use these sections only (## headings in Markdown, in this order):
 
@@ -27,7 +38,8 @@ One paragraph: your strongest Freudian reading of what psychological work this d
 Rules:
 - Freudian analysis only—no generic mindfulness or self-help framing.
 - Tie claims to what appears in the dream text; do not invent facts about the user's life outside that text.
-- Do not diagnose mental illness or give medical advice.`;
+- Do not diagnose mental illness or give medical advice.
+- If the dream is too short or vague for a strong claim, explicitly mark the limit once, then continue with the strongest text-grounded Freudian reading available.`;
 
 export async function POST(request: Request) {
   try {
@@ -67,7 +79,7 @@ export async function POST(request: Request) {
         { role: "user", content: userMessage },
       ],
       max_tokens: 1200,
-      temperature: 0.4,
+      temperature: 0.3,
     });
 
     const analysis = completion.choices[0]?.message?.content?.trim();

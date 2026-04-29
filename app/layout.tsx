@@ -26,10 +26,37 @@ const outfit = Outfit({
   weight: ["300", "400", "500"],
 });
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Soma Studios",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Soma Studios — Dream diary",
+    template: "%s | Soma Studios",
+  },
   description:
     "A softer home for your dreams. Capture what you see at night and return to it with gentle Freudian insight.",
+  openGraph: {
+    type: "website",
+    locale: "en",
+    siteName: "Soma Studios",
+    url: siteUrl,
+    images: [
+      {
+        url: "/assets/soma-studio-logo.png",
+        width: 512,
+        height: 512,
+        alt: "Soma Studios",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Soma Studios — Dream diary",
+    description:
+      "A softer home for your dreams. Freudian-style reflection, in your browser.",
+  },
 };
 
 export default function RootLayout({

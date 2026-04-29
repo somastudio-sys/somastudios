@@ -1,6 +1,5 @@
-Add your Soma Studios images here:
+Soma Studios images in this folder:
 
-- soma-studio-logo.png   (nav logo; your file may be named "Soma Studio Logo.PNG")
-- hero-diary-preview.png (hero and product preview image)
-
-If your logo file is "Soma Studio Logo.PNG", either rename it to soma-studio-logo.png or update the img src in app/page.tsx.
+- soma-studio-logo.png — main nav / brand mark
+- hero-diary-preview.png — hero window (diary UI screenshot)
+- product-moment-*.svg — product carousel placeholders (cosmic / logo-aligned art)

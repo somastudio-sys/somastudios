@@ -60,6 +60,11 @@ export function addPrivateStory(entry: {
   return story;
 }
 
+export function getPrivateStoryById(id: string): RepurposedStory | null {
+  if (!id.trim()) return null;
+  return loadPrivateStories().find((s) => s.id === id) ?? null;
+}
+
 export function deletePrivateStory(id: string) {
   savePrivateStories(loadPrivateStories().filter((s) => s.id !== id));
 }

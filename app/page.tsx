@@ -1,36 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import SiteFooter from "@/components/SiteFooter";
+import SiteNav from "@/components/SiteNav";
+
+const podcastUrl = process.env.NEXT_PUBLIC_PODCAST_URL?.trim();
+
+export const metadata: Metadata = {
+  title: "A softer home for your dreams",
+  description:
+    "Dream diary and gentle Freudian-style reflection in your browser. Password-protected, private by default.",
+};
 
 export default function Home() {
   return (
     <>
       <header className="site-header">
-        <div className="nav-bar">
-          <div className="nav-brand">
-            {/* Add your logo at public/assets/soma-studio-logo.png */}
-            <img
-              src="/assets/soma-studio-logo.png"
-              alt="Soma Studios logo"
-              className="nav-brand-logo"
-            />
-            <span>Soma Studios</span>
-          </div>
-          <nav className="nav-links">
-            <a href="#about">About us</a>
-            <a href="#testimonials">Testimonials</a>
-            <a href="#products">Product</a>
-            <Link href="/blog">Blog</Link>
-            <a href="#download">Download</a>
-          </nav>
-          <div className="nav-cta-group">
-            <Link href="/login" className="nav-login-link">
-              Log in
-            </Link>
-            <a href="#download" className="nav-download-btn">
-              Download
-            </a>
-          </div>
-        </div>
-
+        <SiteNav variant="home" />
         <section className="hero">
           <div className="hero-copy">
             <span className="hero-kicker">Dream diary · Freudian analysis</span>
@@ -40,14 +25,27 @@ export default function Home() {
               Freudian insight.
             </p>
             <div className="hero-actions">
-              <a href="#download" className="btn btn-primary hero-primary">
-                Download Soma
-              </a>
-              <Link href="/diary" className="btn btn-ghost hero-secondary">
+              <Link href="/login" className="btn btn-primary hero-primary">
                 Log in to diary
               </Link>
+              {podcastUrl ? (
+                <a
+                  href={podcastUrl}
+                  className="btn btn-ghost hero-secondary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Listen to the podcast
+                </a>
+              ) : (
+                <Link href="/blog" className="btn btn-ghost hero-secondary">
+                  Read the journal
+                </Link>
+              )}
             </div>
-            <p className="hero-meta">Available for desktop. Private by default.</p>
+            <p className="hero-meta">
+              Password-protected diary · In your browser · Private by default
+            </p>
           </div>
           <div className="hero-visual" aria-hidden="true">
             <div className="hero-window">
@@ -60,7 +58,7 @@ export default function Home() {
                 <div className="hero-window-placeholder">
                   <img
                     src="/assets/hero-diary-preview.png"
-                    alt="Preview of the Soma dream diary interface"
+                    alt="Soma dream diary: date, title, dream text, record, save and clear"
                     className="hero-window-image"
                   />
                 </div>
@@ -70,25 +68,14 @@ export default function Home() {
         </section>
       </header>
 
-      <section id="about" className="info-section">
-        <div className="info-inner">
-          <h2>About us</h2>
-          <p className="about-copy">
-            Soma Studios is a small team building tools for dreamers. We believe
-            the things that surface at night deserve a gentle, private place to
-            land—and that returning to them with curiosity can bring clarity and
-            calm.
-          </p>
-        </div>
-      </section>
-
       <section id="products" className="product-section">
         <div className="product-inner">
           <header className="product-header">
-            <h2>Soma, in three moments</h2>
+            <h2>Soma, in four moments</h2>
             <p className="product-tagline">
-              A calm diary, a gentle analysis engine, and a private archive –
-              shown here as product previews.
+              A calm diary, a gentle analysis engine, choose-your-path stories
+              inspired by your dreams, and a private archive—shown here as
+              product previews.
             </p>
           </header>
           <div
@@ -96,10 +83,10 @@ export default function Home() {
             aria-label="Soma product preview carousel"
           >
             <figure className="product-card">
-              <div className="product-image-frame">
+              <div className="product-image-frame product-image-moment">
                 <img
-                  src="/assets/hero-diary-preview.png"
-                  alt="Preview of the Soma nightly diary entry surface"
+                  src="/assets/product-moment-diary.png"
+                  alt="Phone and quill on soft clouds under a crescent moon"
                 />
               </div>
               <figcaption>
@@ -111,8 +98,11 @@ export default function Home() {
               </figcaption>
             </figure>
             <figure className="product-card">
-              <div className="product-image-frame product-image-placeholder">
-                <span>Freudian analysis view</span>
+              <div className="product-image-frame product-image-moment">
+                <img
+                  src="/assets/product-moment-freud.png"
+                  alt="Open book under a starry sky; a magnifying glass reveals a glowing crescent moon"
+                />
               </div>
               <figcaption>
                 <h3>Freudian lens</h3>
@@ -123,8 +113,27 @@ export default function Home() {
               </figcaption>
             </figure>
             <figure className="product-card">
-              <div className="product-image-frame product-image-placeholder">
-                <span>Private archive view</span>
+              <div className="product-image-frame product-image-moment">
+                <img
+                  src="/assets/product-moment-story.png"
+                  alt="Open book with a glowing golden path leading into a starry sky with castles on the clouds"
+                />
+              </div>
+              <figcaption>
+                <h3>Story journeys</h3>
+                <p>
+                  After you analyse a dream, turn it into a short interactive
+                  tale: pick a genre and branch through a few paths—then save
+                  your repurposed story.
+                </p>
+              </figcaption>
+            </figure>
+            <figure className="product-card">
+              <div className="product-image-frame product-image-moment">
+                <img
+                  src="/assets/product-moment-archive.png"
+                  alt="Dream archive on a phone beside leather books, crystals, and a glowing crystal ball"
+                />
               </div>
               <figcaption>
                 <h3>Private archive</h3>
@@ -188,17 +197,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="download" className="download-section">
-        <div className="download-inner">
-          <h2>Download Soma</h2>
-          <p className="download-tagline">
-            Available for desktop. Private by default.
-          </p>
-          <a href="#download" className="btn btn-primary btn-large">
-            Download for Mac / Windows
-          </a>
-        </div>
-      </section>
+      <SiteFooter />
 
       <div id="toast" className="toast" aria-live="polite" />
     </>
