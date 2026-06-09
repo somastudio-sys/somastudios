@@ -39,11 +39,31 @@ The diary’s **Analyse (Freud)** button calls `POST /api/analyze`, which uses t
 
 Optional: set `OPENAI_MODEL` to another chat model if your account supports it. In the OpenAI dashboard you can set usage limits and budgets.
 
-**Story journey:** After you run **Analyse (Freud)** on a dream, use **Story journey** to pick a literary genre and build a choose-your-path short story from the dream and analysis (same `OPENAI_API_KEY`, `POST /api/story`).
+**Story journey:** After you run **Analyse (Freud)** on a dream, use **Story journey** to pick a genre and build a choose-your-path short story from the dream and analysis (same `OPENAI_API_KEY`, `POST /api/story`).
 
 **Public journal (`/blog`):** Marketing posts for the product (edit `app/blog/MarketingBlogClient.tsx`).
 
-**Private repurposed stories (`/diary/stories`, login required):** After a story journey, **Save to my stories** stores fiction in `localStorage` under `soma-repurposed-stories` (browser-only, not synced).
+**Private repurposed stories (`/diary/stories`, login required):** After a story journey, **Save to my stories** stores fiction in your cloud archive (Postgres), same as dreams.
+
+## Cloud archive (permanent storage)
+
+Dreams and saved stories are stored in **Vercel Postgres** (Neon), not in the browser. Clearing cache will not delete them once `POSTGRES_URL` is configured.
+
+**Local setup**
+
+1. Create a Postgres database in [Vercel Storage](https://vercel.com/docs/storage) (or use an existing Neon project).
+2. Copy `.env.example` → `.env.local` and set:
+   - `POSTGRES_URL` — from Vercel/Neon (required)
+   - `DIARY_PASSWORD` — diary login password (defaults to `soma` if unset)
+   - `DIARY_SESSION_SECRET` — 32+ random characters for the login cookie
+   - `OPENAI_API_KEY` — for Analyse / Story journey
+3. Restart `npm run dev`.
+
+**Vercel deploy**
+
+In Project → Settings → Environment Variables, add `POSTGRES_URL` (from Storage), `DIARY_PASSWORD`, `DIARY_SESSION_SECRET`, and `OPENAI_API_KEY`. Redeploy.
+
+On first load after login, any dreams still in this browser’s old `localStorage` are imported into the cloud archive automatically.
 
 ## Deploy on Vercel
 

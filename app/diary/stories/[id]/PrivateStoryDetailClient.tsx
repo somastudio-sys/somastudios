@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { RepurposedStory } from "@/lib/privateStoriesStorage";
-import {
-  deletePrivateStory,
-  getPrivateStoryById,
-} from "@/lib/privateStoriesStorage";
+import { deleteStoryApi, fetchStoryById } from "@/lib/diaryApi";
 
 export default function PrivateStoryDetailClient() {
   const params = useParams();
@@ -18,18 +15,23 @@ export default function PrivateStoryDetailClient() {
   const [story, setStory] = useState<RepurposedStory | null | undefined>(
     undefined
   );
-  const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback(async () => {
     if (!storyId) {
       setStory(null);
       return;
     }
-    setStory(getPrivateStoryById(storyId));
+    setError(null);
+    try {
+      setStory(await fetchStoryById(storyId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load story.");
+      setStory(null);
+    }
   }, [storyId]);
 
   useEffect(() => {
-    setMounted(true);
     refresh();
   }, [refresh]);
 
@@ -39,18 +41,32 @@ export default function PrivateStoryDetailClient() {
     }
   }, [story]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!story) return;
     if (!confirm("Remove this story from your private collection?")) return;
-    deletePrivateStory(story.id);
-    router.push("/diary/stories");
+    try {
+      await deleteStoryApi(story.id);
+      router.push("/diary/stories");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not remove story.");
+    }
   };
 
-  if (!mounted || story === undefined) {
+  if (story === undefined) {
     return (
       <div className="private-stories-page">
         <div className="private-stories-main">
           <p className="private-stories-empty">Loading…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="private-stories-page">
+        <div className="private-stories-main">
+          <p className="private-stories-empty">{error}</p>
         </div>
       </div>
     );

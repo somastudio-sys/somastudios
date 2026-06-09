@@ -1,4 +1,4 @@
-/** Repurposed story journeys — private, browser-only, diary login area. */
+/** Repurposed story journeys — types shared by UI and cloud storage API. */
 
 export type RepurposedStory = {
   id: string;

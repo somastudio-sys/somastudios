@@ -30,11 +30,15 @@ export default function PrivacyPage() {
 
           <h2>What you store in the diary</h2>
           <p>
-            Dream entries you save in the diary are stored in your
-            browser&apos;s local storage on your device unless we introduce
-            optional sync or cloud features later. That means your archive stays
-            on the machine where you use Soma, unless you copy it elsewhere
-            yourself.
+            Dream entries and saved story journeys are stored in a secure cloud
+            database linked to your deployment, not only in your browser. That
+            means your archive survives clearing browser cache, as long as you
+            log in with the same diary password on the same Soma site.
+          </p>
+          <p>
+            If you used an older version that kept data only in the browser,
+            any entries still in local storage are imported into the cloud
+            archive the first time you open the diary after an update.
           </p>
 
           <h2>When you use “Analyse (Freud)” or Story journey</h2>
@@ -49,9 +53,9 @@ export default function PrivacyPage() {
 
           <h2>Password</h2>
           <p>
-            Access to the diary area is gated by a password you configure for
-            the deployment. Treat it like a shared secret for a private
-            prototype—not bank-grade security.
+            Access to the diary area is gated by a password you configure on the
+            server (<code>DIARY_PASSWORD</code> in your deployment). Treat it
+            like a shared secret for a private prototype—not bank-grade security.
           </p>
 
           <h2>Not medical or therapeutic advice</h2>

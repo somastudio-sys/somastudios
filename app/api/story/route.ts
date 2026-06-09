@@ -1,21 +1,33 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-/** Tight genre rules — models drift to generic “literary” prose without this. Keys match `GENRES[].id` in the diary UI. */
+/** Tight genre rules — models drift to bland neutral prose without this. Keys match `GENRES[].id` in the diary UI. */
 const GENRE_CONTRACTS: Record<string, string> = {
-  literary: `LITERARY FICTION (mandatory style):
-- Prioritize interior psychology, subtext, and precise sensory detail over plot mechanics.
-- Voice: controlled third-person or close first-person; nuanced, restrained; avoid melodrama and genre clichés.
-- Sentence rhythm: varied; allow quiet moments and ambiguity; theme over twist.
-- Do NOT default to noir cynicism, fantasy proper nouns, sci-fi tech, or gothic haunted-castle pastiche unless the dream truly demands it—stay in literary-realist or quietly experimental register.`,
-
-  noir: `NOIR / HARD-BOILED DETECTIVE (mandatory style — this is NOT generic fiction):
+  noir: `NOIR / HARD-BOILED (mandatory style — this is NOT generic fiction):
 - Setting & texture: night, city, rain or dry heat haze, cheap rooms, alleys, neon, smoke, shadows, institutional rot, moral grey zones. Anchor at least two concrete noir images per segment (e.g. wet asphalt, desk lamp, bruised sky, filing cabinet, last cigarette).
 - Voice: spare, cynical, weary; short punchy sentences mixed with longer fatalistic ones; vernacular allowed; suspicion and doubt drive the prose.
 - Themes: betrayal, secrecy, lust-as-trap, corruption, the case that isn’t what it seems.
 - POV: first-person hard-boiled OR tight third on a jaded investigator or cornered protagonist.
 - FORBIDDEN in this genre: cozy warmth as default tone, pastoral fairy-tale openings, high fantasy (thrones, spells, elves), space stations, mythic omniscient bard voice, inspirational self-help cadence.
-- If the prose could be mistaken for “literary fiction” or “dream journal,” rewrite until the noir register is unmistakable.`,
+- If the prose could be mistaken for a cozy procedural or “dream journal,” rewrite until the noir register is unmistakable.`,
+
+  detective: `DETECTIVE / PROCEDURAL (mandatory style — not the same as noir atmosphere):
+- Engine: clues, interviews, timelines, deduction, evidence, suspects, alibis, case theory that shifts as facts surface.
+- Texture: stations, case boards, forensics detail at a readable level, notebooks, surveillance stills, autopsy summaries (tasteful), warrants, jurisdiction friction.
+- Voice: clear, observant third-person or tight third on the investigator; competence and doubt in balance—less fatalistic lyricism than noir, more method and revelation.
+- FORBIDDEN default: pure gothic haunting with no investigation; space-opera set dressing; romance-first plot with no mystery spine.`,
+
+  thriller: `THRILLER (mandatory style):
+- Pace: urgency, jeopardy, reversals, narrow escapes, deadlines, competence under pressure; each segment should raise or twist physical or psychological stakes.
+- Texture: pursuit, surveillance, ticking clock, encrypted message, safe house, chase geography, weapon as Chekhov’s gun (threat > gore), conspiracy glimpsed through partial information.
+- Tone: lean, propulsive sentences mixed with breath-holding stillness; dread of what comes next.
+- FORBIDDEN default: cozy pastoral slice-of-life, mythic-fable omniscience, or pure puzzle-box detective with zero bodily peril unless the dream clearly demands cold procedural only.`,
+
+  dystopian: `DYSTOPIAN (mandatory style):
+- World: collapsed or authoritarian order—surveillance, rationing, ruined infrastructure, propaganda, cult-of-compliance, underground resistance whispers, environmental decay tied to power.
+- Anchor each segment in how the system touches bodies and choices (permits, checkpoints, curated truth, scarcity), not vague “bad future.”
+- Voice: weary, defiant, or numb clarity; moral grey without nihilistic edgelord posturing.
+- FORBIDDEN default: cozy nostalgia, high-fantasy spellcraft as main engine, pure space wonder without oppression texture, romcom banter as default.`,
 
   fantasy: `FANTASY (mandatory style):
 - Use recognizable fantasy texture: magic, mythic stakes, non-modern secondary-world or mythic intrusion, proper names for places/factions where fitting.
@@ -39,6 +51,33 @@ const GENRE_CONTRACTS: Record<string, string> = {
 - Voice: warm, yearning, conflicted, or wistful—not cynical noir by default.
 - FORBIDDEN default: pure horror dread, hard-boiled investigation, or cold SF concept piece with no relational heart.`,
 
+  inspirational: `INSPIRATIONAL (mandatory style):
+- Engine: earned hope, courage under fear, small decisive acts that matter, repair and renewal—uplift must come from concrete scenes and choices, not slogans.
+- Voice: sincere, clear third-person; warmth and gravity in balance; allow struggle on the page so the turn toward light feels deserved.
+- FORBIDDEN default: hollow self-help platitudes (“everything happens for a reason”), preachy sermonizing, toxic positivity that erases cost, cynical noir default, gothic dread as main note.`,
+
+  lighthearted: `LIGHT-HEARTED (mandatory style):
+- Engine: gentle wit, playful mishaps, low-stakes charm, comic relief that never humiliates; the world is basically kind or absurd in a fond way.
+- Voice: buoyant, rhythmic, smiling third-person; banter and situational comedy without bite or satirical cruelty.
+- FORBIDDEN default: dystopian oppression, tragedy spiral, noir cynicism, savage satire, horror dread, gritty thriller jeopardy as the dominant texture.`,
+
+  feelgood: `FEEL-GOOD (mandatory style):
+- Engine: comfort, reconciliation, deserved kindness, “weight lifts” moments, found-family or renewed belonging—payoff should feel satisfying and humane.
+- Texture: sensory coziness where fitting (warm light, food shared, laughter), honest apologies, second chances that land.
+- FORBIDDEN default: ironic twist that punishes the reader, bleak nihilism, procedural coldness, tragedy-first framing, satirical takedown energy.`,
+
+  satire: `SATIRE (mandatory style):
+- Target: institutions, vanities, hypocrisies, and absurd rules—exaggerate until the flaw is unmistakable; keep real-world protected groups out of the punchline; punch up at power, not down at marginalization.
+- Voice: ironic, deadpan, or biting wit; juxtaposition of official language vs lived reality; bureaucratic euphemism played straight.
+- Each segment should sharpen the critique through concrete scene business, not essayistic moralizing.
+- FORBIDDEN default: neutral realism with no bite, pure horror dread, earnest romance with no ironic frame unless the dream clearly isn’t satirical.`,
+
+  tragedy: `TRAGEDY (mandatory style):
+- Shape: inevitable consequence, irreversible choice, noble intention colliding with flaw or fate; weight and solemnity without melodrama clichés (“it was all a dream” cop-out).
+- Tone: foreboding, cathartic dread, moral cost made concrete through action and image; allow quiet devastation.
+- Avoid cheap reversal into comedy or cozy resolution unless the user’s dream explicitly demands ambiguity—still keep tragic gravity dominant.
+- FORBIDDEN default: sitcom banter, puzzle-box cozy mystery, space-opera wonder, ironic satire as the primary register.`,
+
   magical: `MAGICAL REALISM (mandatory style):
 - Everyday world + impossible events treated as matter-of-fact; no high-fantasy quest framing.
 - Political/historical undertone optional; family and memory often central; one strange image carries symbolic weight.
@@ -54,8 +93,10 @@ const GENRE_CONTRACTS: Record<string, string> = {
 const DEFAULT_GENRE_CONTRACT = `Match the genre label the user chose with unmistakable voice, setting, and diction. Do not write neutral “could be anything” prose—genre must be obvious from wording alone.`;
 
 const GENRE_ANCHORS: Record<string, string[]> = {
-  literary: ["interior monologue", "precise sensory detail", "subtext"],
   noir: ["neon", "wet asphalt", "case file", "smoke", "alley"],
+  detective: ["alibis", "evidence bag", "interview room", "timeline", "warrant"],
+  thriller: ["deadline", "pursuit", "safe house", "surveillance", "breath held"],
+  dystopian: ["checkpoint", "ration card", "curfew", "propaganda screen", "black market"],
   fantasy: ["spell", "sigil", "ruin", "kingdom", "oracle"],
   scifi: [
     "airlock",
@@ -71,6 +112,11 @@ const GENRE_ANCHORS: Record<string, string[]> = {
   ],
   gothic: ["manor", "crypt", "candle", "storm", "ancestral portrait"],
   romance: ["longing", "confession", "touch", "distance", "reconciliation"],
+  inspirational: ["second chance", "steadier breath", "hand offered", "quiet resolve", "dawn light"],
+  lighthearted: ["grin", "harmless chaos", "banter", "shrug", "sunny room"],
+  feelgood: ["warm drink", "laughter returned", "reunion", "weight lifts", "belonging"],
+  satire: ["euphemism", "committee", "memo", "photo op", "compliance training"],
+  tragedy: ["oath", "reckoning", "last chance", "cost paid", "silence after"],
   magical: ["ordinary street", "impossible omen", "family memory"],
   myth: ["threshold", "omen", "oath", "beast", "oracle"],
 };
@@ -82,16 +128,26 @@ function resolveGenreContract(genreId: string | undefined, genreLabel: string): 
   }
   const label = genreLabel.trim().toLowerCase();
   const labelToId: [string, string][] = [
-    ["literary fiction", "literary"],
-    ["noir", "noir"],
-    ["detective", "noir"],
-    ["fantasy", "fantasy"],
+    ["magical realism", "magical"],
     ["science fiction", "scifi"],
     ["sci-fi", "scifi"],
+    ["noir / detective", "noir"],
+    ["noir", "noir"],
+    ["detective", "detective"],
+    ["thriller", "thriller"],
+    ["dystopian", "dystopian"],
+    ["fantasy", "fantasy"],
     ["gothic", "gothic"],
     ["horror", "gothic"],
     ["romance", "romance"],
-    ["magical realism", "magical"],
+    ["light-hearted", "lighthearted"],
+    ["lighthearted", "lighthearted"],
+    ["feel-good", "feelgood"],
+    ["feel good", "feelgood"],
+    ["feelgood", "feelgood"],
+    ["inspirational", "inspirational"],
+    ["satire", "satire"],
+    ["tragedy", "tragedy"],
     ["myth", "myth"],
     ["fable", "myth"],
   ];
@@ -109,16 +165,26 @@ function resolveGenreKey(genreId: string | undefined, genreLabel: string): strin
   if (id && GENRE_CONTRACTS[id]) return id;
   const label = genreLabel.trim().toLowerCase();
   const labelToId: [string, string][] = [
-    ["literary fiction", "literary"],
-    ["noir", "noir"],
-    ["detective", "noir"],
-    ["fantasy", "fantasy"],
+    ["magical realism", "magical"],
     ["science fiction", "scifi"],
     ["sci-fi", "scifi"],
+    ["noir / detective", "noir"],
+    ["noir", "noir"],
+    ["detective", "detective"],
+    ["thriller", "thriller"],
+    ["dystopian", "dystopian"],
+    ["fantasy", "fantasy"],
     ["gothic", "gothic"],
     ["horror", "gothic"],
     ["romance", "romance"],
-    ["magical realism", "magical"],
+    ["light-hearted", "lighthearted"],
+    ["lighthearted", "lighthearted"],
+    ["feel-good", "feelgood"],
+    ["feel good", "feelgood"],
+    ["feelgood", "feelgood"],
+    ["inspirational", "inspirational"],
+    ["satire", "satire"],
+    ["tragedy", "tragedy"],
     ["myth", "myth"],
     ["fable", "myth"],
   ];

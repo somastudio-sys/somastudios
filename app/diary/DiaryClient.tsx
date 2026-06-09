@@ -3,9 +3,22 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { addPrivateStory } from "@/lib/privateStoriesStorage";
+import {
+  createDreamApi,
+  createStoryApi,
+  deleteDreamApi,
+  fetchDreams,
+  migrateDreamsApi,
+  migrateStoriesApi,
+  updateDreamApi,
+} from "@/lib/diaryApi";
+import {
+  clearLocalDreams,
+  clearLocalStories,
+  readLocalDreams,
+  readLocalStories,
+} from "@/lib/localDiaryMigration";
 import type { DreamEntry } from "./types";
-import { STORAGE_KEY } from "./types";
 
 type SpeechRecognitionLike = {
   continuous: boolean;
@@ -19,12 +32,19 @@ type SpeechRecognitionLike = {
 };
 
 const GENRES: { id: string; label: string }[] = [
-  { id: "literary", label: "Literary fiction" },
-  { id: "noir", label: "Noir / detective" },
+  { id: "noir", label: "Noir" },
+  { id: "detective", label: "Detective" },
+  { id: "thriller", label: "Thriller" },
+  { id: "dystopian", label: "Dystopian" },
   { id: "fantasy", label: "Fantasy" },
   { id: "scifi", label: "Science fiction" },
   { id: "gothic", label: "Gothic horror" },
   { id: "romance", label: "Romance" },
+  { id: "inspirational", label: "Inspirational" },
+  { id: "lighthearted", label: "Light-hearted" },
+  { id: "feelgood", label: "Feel-good" },
+  { id: "satire", label: "Satire" },
+  { id: "tragedy", label: "Tragedy" },
   { id: "magical", label: "Magical realism" },
   { id: "myth", label: "Myth / fable" },
 ];
@@ -32,23 +52,11 @@ const GENRES: { id: string; label: string }[] = [
 /** After the opening, the reader gets this many "what happens next?" screens, then the story ends. */
 const MAX_STORY_CHOICE_ROUNDS = 3;
 
-function loadEntries(): DreamEntry[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as DreamEntry[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveEntries(entries: DreamEntry[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
-
 export default function DiaryClient() {
   const router = useRouter();
   const [entries, setEntries] = useState<DreamEntry[]>([]);
+  const [entriesLoading, setEntriesLoading] = useState(true);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
   const [dreamDate, setDreamDate] = useState("");
   const [dreamTitle, setDreamTitle] = useState("");
   const [dreamContent, setDreamContent] = useState("");
@@ -77,9 +85,58 @@ export default function DiaryClient() {
   }, []);
 
   useEffect(() => {
-    setEntries(loadEntries());
+    let cancelled = false;
+
+    async function loadArchive() {
+      setEntriesLoading(true);
+      setArchiveError(null);
+      try {
+        const localDreams = readLocalDreams();
+        const localStories = readLocalStories();
+
+        if (localDreams.length > 0) {
+          const imported = await migrateDreamsApi(localDreams);
+          clearLocalDreams();
+          if (imported > 0 && !cancelled) {
+            showToast(
+              `Imported ${imported} dream${imported === 1 ? "" : "s"} from this browser into your cloud archive.`,
+              "success"
+            );
+          }
+        }
+
+        if (localStories.length > 0) {
+          const importedStories = await migrateStoriesApi(localStories);
+          clearLocalStories();
+          if (importedStories > 0 && !cancelled) {
+            showToast(
+              `Imported ${importedStories} saved stor${importedStories === 1 ? "y" : "ies"} into your cloud archive.`,
+              "success"
+            );
+          }
+        }
+
+        const dreams = await fetchDreams();
+        if (!cancelled) setEntries(dreams);
+      } catch (err) {
+        if (!cancelled) {
+          const message =
+            err instanceof Error ? err.message : "Could not load your archive.";
+          setArchiveError(message);
+          showToast(message);
+        }
+      } finally {
+        if (!cancelled) setEntriesLoading(false);
+      }
+    }
+
+    loadArchive();
     setDreamDate(new Date().toISOString().slice(0, 10));
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showToast]);
 
   useEffect(() => {
     if (!dreamReadModal) return;
@@ -90,12 +147,7 @@ export default function DiaryClient() {
     return () => window.removeEventListener("keydown", onKey);
   }, [dreamReadModal]);
 
-  const persist = useCallback((next: DreamEntry[]) => {
-    setEntries(next);
-    saveEntries(next);
-  }, []);
-
-  const saveDream = () => {
+  const saveDream = async () => {
     const content = dreamContent.trim();
     if (!content) {
       showToast("Write or record something first.");
@@ -103,19 +155,16 @@ export default function DiaryClient() {
     }
     const date = dreamDate || new Date().toISOString().slice(0, 10);
     const title = dreamTitle.trim() || undefined;
-    const newDream: DreamEntry = {
-      id: `dream-${Date.now()}`,
-      date,
-      title,
-      content,
-      createdAt: new Date().toISOString(),
-    };
-    const next = [...loadEntries(), newDream];
-    persist(next);
-    setDreamContent("");
-    setDreamTitle("");
-    setDreamDate(new Date().toISOString().slice(0, 10));
-    showToast("Dream saved to your archive.", "success");
+    try {
+      const saved = await createDreamApi({ date, title, content });
+      setEntries((prev) => [saved, ...prev]);
+      setDreamContent("");
+      setDreamTitle("");
+      setDreamDate(new Date().toISOString().slice(0, 10));
+      showToast("Dream saved to your archive.", "success");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Could not save dream.");
+    }
   };
 
   const clearForm = () => {
@@ -125,10 +174,15 @@ export default function DiaryClient() {
     showToast("Editor cleared.");
   };
 
-  const deleteDream = (id: string) => {
+  const deleteDream = async (id: string) => {
     if (!confirm("Delete this dream from your diary?")) return;
-    persist(loadEntries().filter((e) => e.id !== id));
-    showToast("Dream removed.", "success");
+    try {
+      await deleteDreamApi(id);
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+      showToast("Dream removed.", "success");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Could not delete dream.");
+    }
   };
 
   const loadIntoEditor = (dream: DreamEntry) => {
@@ -159,21 +213,16 @@ export default function DiaryClient() {
   };
 
   const runAnalyze = async (id: string) => {
-    const dream = loadEntries().find((e) => e.id === id);
+    const dream = entries.find((e) => e.id === id);
     if (!dream) return;
     setAnalyzingId(id);
     try {
       const analysis = await analyzeDream(dream);
-      const next = loadEntries().map((e) =>
-        e.id === id
-          ? {
-              ...e,
-              freudAnalysis: analysis,
-              analyzedAt: new Date().toISOString(),
-            }
-          : e
-      );
-      persist(next);
+      const updated = await updateDreamApi(id, {
+        freudAnalysis: analysis,
+        analyzedAt: new Date().toISOString(),
+      });
+      setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
       showToast("Freudian analysis saved.", "success");
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Analysis failed.");
@@ -272,21 +321,25 @@ export default function DiaryClient() {
     setPublishTitle("");
   };
 
-  const saveStoryPrivate = () => {
+  const saveStoryPrivate = async () => {
     if (!storyDream || !storyGenre || storyLog.length === 0) return;
     const body = storyLog.join("\n\n").trim();
     if (!body) return;
     const defaultTitle = `${storyDream.title || "Untitled dream"} · ${storyGenre}`;
-    const saved = addPrivateStory({
-      title: publishTitle.trim() || defaultTitle,
-      genre: storyGenre,
-      dreamId: storyDream.id,
-      body,
-    });
-    showToast("Saved — opening your story.", "success");
-    setPublishTitle("");
-    closeStory();
-    router.push(`/diary/stories/${encodeURIComponent(saved.id)}`);
+    try {
+      const saved = await createStoryApi({
+        title: publishTitle.trim() || defaultTitle,
+        genre: storyGenre,
+        dreamId: storyDream.id,
+        body,
+      });
+      showToast("Saved — opening your story.", "success");
+      setPublishTitle("");
+      closeStory();
+      router.push(`/diary/stories/${encodeURIComponent(saved.id)}`);
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Could not save story.");
+    }
   };
 
   const storySoFarText = storyLog.join("\n\n");
@@ -480,7 +533,11 @@ export default function DiaryClient() {
         <section className="archive-section">
           <h2>Archive</h2>
           <div id="archive-list" className="archive-list">
-            {sorted.length === 0 ? (
+            {entriesLoading ? (
+              <p className="empty-archive">Loading your archive…</p>
+            ) : archiveError ? (
+              <p className="empty-archive">{archiveError}</p>
+            ) : sorted.length === 0 ? (
               <p className="empty-archive">
                 No dreams archived yet. Write one above and save it.
               </p>

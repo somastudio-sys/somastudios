@@ -3,23 +3,25 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-const AUTH_KEY = "soma-diary-auth";
-const DEFAULT_PASSWORD = process.env.NEXT_PUBLIC_DIARY_PASSWORD || "soma";
+import { login } from "@/lib/diaryApi";
 
 export default function LoginForm() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (password === DEFAULT_PASSWORD) {
-      sessionStorage.setItem(AUTH_KEY, "1");
+    setSubmitting(true);
+    try {
+      await login(password);
       router.push("/diary");
-    } else {
+    } catch {
       setError("Incorrect password. Try again.");
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -41,10 +43,15 @@ export default function LoginForm() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter password"
             autoComplete="current-password"
+            disabled={submitting}
           />
           {error && <p className="login-error" role="alert">{error}</p>}
-          <button type="submit" className="btn btn-primary login-submit">
-            Log in to diary
+          <button
+            type="submit"
+            className="btn btn-primary login-submit"
+            disabled={submitting}
+          >
+            {submitting ? "Logging in…" : "Log in to diary"}
           </button>
         </form>
         <div className="login-secondary-links">

@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-const AUTH_KEY = "soma-diary-auth";
+import { fetchSession } from "@/lib/diaryApi";
 
 export default function DiaryGuard({
   children,
@@ -14,12 +13,22 @@ export default function DiaryGuard({
   const [allowed, setAllowed] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (sessionStorage.getItem(AUTH_KEY) === "1") {
-      setAllowed(true);
-    } else {
-      router.replace("/login");
-    }
+    let cancelled = false;
+    fetchSession()
+      .then(({ authenticated }) => {
+        if (cancelled) return;
+        if (authenticated) {
+          setAllowed(true);
+        } else {
+          router.replace("/login");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) router.replace("/login");
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [router]);
 
   if (!allowed) {

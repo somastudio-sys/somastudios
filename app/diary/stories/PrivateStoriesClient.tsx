@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import type { RepurposedStory } from "@/lib/privateStoriesStorage";
-import {
-  deletePrivateStory,
-  loadPrivateStories,
-} from "@/lib/privateStoriesStorage";
+import { deleteStoryApi, fetchStories } from "@/lib/diaryApi";
 
 function storyExcerpt(body: string, max = 140): string {
   const line = body.replace(/\s+/g, " ").trim();
@@ -16,23 +13,35 @@ function storyExcerpt(body: string, max = 140): string {
 
 export default function PrivateStoriesClient() {
   const [stories, setStories] = useState<RepurposedStory[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
-    setStories(loadPrivateStories());
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setStories(await fetchStories());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load stories.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    setMounted(true);
     refresh();
   }, [refresh]);
 
-  const handleDelete = (id: string, e: MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = async (id: string, e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     if (!confirm("Remove this story from your private collection?")) return;
-    deletePrivateStory(id);
-    refresh();
+    try {
+      await deleteStoryApi(id);
+      refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not remove story.");
+    }
   };
 
   const sorted = [...stories].sort(
@@ -48,15 +57,17 @@ export default function PrivateStoriesClient() {
           </Link>
           <h1 className="private-stories-title">My repurposed stories</h1>
           <p className="private-stories-lede">
-            Story journeys you’ve saved from your dreams—private to this
-            browser, only visible after login. Open a story to read it in full.
+            Story journeys you’ve saved from your dreams—stored in your cloud
+            archive, only visible after login. Open a story to read it in full.
           </p>
         </div>
       </header>
 
       <main className="private-stories-main">
-        {!mounted ? (
+        {loading ? (
           <p className="private-stories-empty">Loading…</p>
+        ) : error ? (
+          <p className="private-stories-empty">{error}</p>
         ) : sorted.length === 0 ? (
           <div className="private-stories-empty">
             <p>No saved stories yet.</p>
