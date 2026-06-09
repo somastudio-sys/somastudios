@@ -18,8 +18,10 @@ export default function LoginForm() {
     try {
       await login(password);
       router.push("/diary");
-    } catch {
-      setError("Incorrect password. Try again.");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Login failed. Try again.";
+      setError(message === "Incorrect password." ? "Incorrect password. Try again." : message);
     } finally {
       setSubmitting(false);
     }

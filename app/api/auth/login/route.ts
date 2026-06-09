@@ -14,9 +14,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Incorrect password." }, { status: 401 });
   }
 
-  const session = await getDiarySession();
-  session.isLoggedIn = true;
-  await session.save();
-
-  return NextResponse.json({ ok: true });
+  try {
+    const session = await getDiarySession();
+    session.isLoggedIn = true;
+    await session.save();
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Could not start session.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
