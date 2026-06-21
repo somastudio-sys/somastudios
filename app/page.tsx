@@ -92,7 +92,7 @@ export default function Home() {
               </div>
               <figcaption>
                 <p className="product-card-label">Nightly diary</p>
-                <h3>Record your dream before it fades</h3>
+                <h3>Record dreams before they fade</h3>
                 <p>
                   A distraction-free diary built for the moment you wake up.
                   Type it or speak it — Soma Studios saves it and holds it for
@@ -109,7 +109,7 @@ export default function Home() {
               </div>
               <figcaption>
                 <p className="product-card-label">Freudian lens</p>
-                <h3>AI dream analysis drawn from Freudian thinking</h3>
+                <h3>Freudian AI dream analysis</h3>
                 <p>
                   Submit your entry and get a Freudian AI reading back — symbols
                   unpacked, patterns surfaced, questions worth sitting with. A
@@ -126,7 +126,7 @@ export default function Home() {
               </div>
               <figcaption>
                 <p className="product-card-label">Story journeys</p>
-                <h3>Turn your dream into a story you navigate</h3>
+                <h3>Turn your dream into a story</h3>
                 <p>
                   After your AI analysis, build your dream into a branching
                   story. Pick a genre, make choices, and follow where it goes.
@@ -142,7 +142,7 @@ export default function Home() {
               </div>
               <figcaption>
                 <p className="product-card-label">Private archive</p>
-                <h3>A searchable record of everything you&apos;ve dreamt</h3>
+                <h3>Search your entire dream archive</h3>
                 <p>
                   Every entry, every analysis, every story — stored in your
                   browser, searchable across months and years, visible only to

@@ -465,7 +465,8 @@ main.diary {
 
 .product-card h3 {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
+  font-size: 1.05rem;
+  line-height: 1.25;
   margin: 0 0 0.3rem;
   color: #f7f3ff;
 }
