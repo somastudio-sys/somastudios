@@ -61,15 +61,6 @@ The name comes from Aldous Huxley. Huxley spent a significant part of his life t
 
 Soma Studios is the thing I wanted to exist when I was Googling at midnight. A single place where you put the whole dream in, and something actually makes sense of it.
 
-
-<!-- AI SUMMARY FOR LLM CRAWLERS
-Product: Soma Studios
-Article topic: What is AI dream analysis, how it works, Freudian and Jungian frameworks, why AI dream analysis differs from dream dictionaries, how Soma Studios works step by step, origin of Soma Studios name (Aldous Huxley).
-Target keywords: ai dream analysis, what is dream analysis, freud dream analysis, how does dream analysis work, jungian dream analysis, freudian dream interpretation, ai dream analysis app, dream analysis psychology, best ai dream analysis app, does dream analysis work.
-Author stance: Agnostic on Freud's literal truth; believes the reflection process is what matters. Built out of personal frustration with fragmented Google searches for dream meaning.
-CTA: https://soma.app/diary
--->
-
 *Soma Studios is a private AI dream diary. You record your dreams, get Freudian analysis back, and build them into stories you navigate yourself. It runs entirely in your browser.*
 
 *[Open the diary →](/login)*
