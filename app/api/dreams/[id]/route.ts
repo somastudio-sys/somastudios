@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { deleteDream, updateDream } from "@/lib/dreamsDb";
-import { requireDiarySession } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(req: Request, context: RouteContext) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -22,7 +22,7 @@ export async function PATCH(req: Request, context: RouteContext) {
     return NextResponse.json({ error: "Invalid JSON." }, { status: 400 });
   }
 
-  const patch: Parameters<typeof updateDream>[1] = {};
+  const patch: Parameters<typeof updateDream>[2] = {};
   if (typeof body.date === "string") patch.date = body.date;
   if (typeof body.title === "string") patch.title = body.title.trim() || undefined;
   if (typeof body.content === "string") patch.content = body.content.trim();
@@ -30,7 +30,7 @@ export async function PATCH(req: Request, context: RouteContext) {
   if (typeof body.analyzedAt === "string") patch.analyzedAt = body.analyzedAt;
 
   try {
-    const dream = await updateDream(id, patch);
+    const dream = await updateDream(userId, id, patch);
     if (!dream) {
       return NextResponse.json({ error: "Dream not found." }, { status: 404 });
     }
@@ -44,8 +44,8 @@ export async function PATCH(req: Request, context: RouteContext) {
 }
 
 export async function DELETE(_req: Request, context: RouteContext) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -55,7 +55,7 @@ export async function DELETE(_req: Request, context: RouteContext) {
   }
 
   try {
-    const removed = await deleteDream(id);
+    const removed = await deleteDream(userId, id);
     if (!removed) {
       return NextResponse.json({ error: "Dream not found." }, { status: 404 });
     }

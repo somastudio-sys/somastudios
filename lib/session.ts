@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 export type DiarySession = {
   isLoggedIn?: boolean;
+  userId?: string;
 };
 
 function sessionPassword(): string {
@@ -35,12 +36,13 @@ export async function getDiarySession() {
 
 export async function requireDiarySession() {
   const session = await getDiarySession();
-  if (!session.isLoggedIn) {
+  if (!session.isLoggedIn || !session.userId) {
     return null;
   }
   return session;
 }
 
-export function diaryPassword(): string {
-  return process.env.DIARY_PASSWORD?.trim() || "soma";
+export async function requireUserId(): Promise<string | null> {
+  const session = await requireDiarySession();
+  return session?.userId ?? null;
 }

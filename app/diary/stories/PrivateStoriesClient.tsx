@@ -52,9 +52,6 @@ export default function PrivateStoriesClient() {
     <div className="private-stories-page">
       <header className="private-stories-header">
         <div className="private-stories-header-inner">
-          <Link href="/diary" className="private-stories-back">
-            ← Diary
-          </Link>
           <h1 className="private-stories-title">My repurposed stories</h1>
           <p className="private-stories-lede">
             Story journeys you’ve saved from your dreams—stored in your cloud

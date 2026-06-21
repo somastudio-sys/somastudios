@@ -438,9 +438,6 @@ export default function DiaryClient() {
           <p className="tagline">
             Capture and recreate the things that disturb you at night.
           </p>
-          <p className="diary-blog-link">
-            <Link href="/diary/stories">My repurposed stories →</Link>
-          </p>
         </header>
 
         {analyzingDream ? (

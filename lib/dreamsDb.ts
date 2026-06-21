@@ -31,18 +31,20 @@ function rowToDream(row: DreamRow): DreamEntry {
   };
 }
 
-export async function listDreams(): Promise<DreamEntry[]> {
+export async function listDreams(userId: string): Promise<DreamEntry[]> {
   await ensureSchema();
   const sql = getSql();
   const rows = await sql`
     SELECT id, date, title, content, created_at, freud_analysis, analyzed_at
     FROM dreams
+    WHERE user_id = ${userId}
     ORDER BY created_at DESC
   `;
   return (rows as DreamRow[]).map(rowToDream);
 }
 
 export async function createDream(
+  userId: string,
   entry: Omit<DreamEntry, "id" | "createdAt"> & { id?: string; createdAt?: string }
 ): Promise<DreamEntry> {
   await ensureSchema();
@@ -50,9 +52,10 @@ export async function createDream(
   const id = entry.id ?? `dream-${Date.now()}`;
   const createdAt = entry.createdAt ?? new Date().toISOString();
   await sql`
-    INSERT INTO dreams (id, date, title, content, created_at, freud_analysis, analyzed_at)
+    INSERT INTO dreams (id, user_id, date, title, content, created_at, freud_analysis, analyzed_at)
     VALUES (
       ${id},
+      ${userId},
       ${entry.date},
       ${entry.title ?? null},
       ${entry.content},
@@ -73,6 +76,7 @@ export async function createDream(
 }
 
 export async function updateDream(
+  userId: string,
   id: string,
   patch: Partial<
     Pick<DreamEntry, "date" | "title" | "content" | "freudAnalysis" | "analyzedAt">
@@ -83,7 +87,7 @@ export async function updateDream(
   const existing = await sql`
     SELECT id, date, title, content, created_at, freud_analysis, analyzed_at
     FROM dreams
-    WHERE id = ${id}
+    WHERE id = ${id} AND user_id = ${userId}
     LIMIT 1
   `;
   const rows = existing as DreamRow[];
@@ -104,28 +108,43 @@ export async function updateDream(
       content = ${next.content},
       freud_analysis = ${next.freudAnalysis ?? null},
       analyzed_at = ${next.analyzedAt ?? null}
-    WHERE id = ${id}
+    WHERE id = ${id} AND user_id = ${userId}
   `;
 
   return next;
 }
 
-export async function deleteDream(id: string): Promise<boolean> {
+export async function deleteDream(userId: string, id: string): Promise<boolean> {
   await ensureSchema();
   const sql = getSql();
-  const rows = await sql`DELETE FROM dreams WHERE id = ${id} RETURNING id`;
+  const rows = await sql`
+    DELETE FROM dreams WHERE id = ${id} AND user_id = ${userId} RETURNING id
+  `;
   return (rows as { id: string }[]).length > 0;
 }
 
-export async function migrateDreams(entries: DreamEntry[]): Promise<number> {
+export async function deleteAllDreams(userId: string): Promise<number> {
+  await ensureSchema();
+  const sql = getSql();
+  const rows = await sql`
+    DELETE FROM dreams WHERE user_id = ${userId} RETURNING id
+  `;
+  return (rows as { id: string }[]).length;
+}
+
+export async function migrateDreams(
+  userId: string,
+  entries: DreamEntry[]
+): Promise<number> {
   await ensureSchema();
   const sql = getSql();
   let imported = 0;
   for (const entry of entries) {
     const rows = await sql`
-      INSERT INTO dreams (id, date, title, content, created_at, freud_analysis, analyzed_at)
+      INSERT INTO dreams (id, user_id, date, title, content, created_at, freud_analysis, analyzed_at)
       VALUES (
         ${entry.id},
+        ${userId},
         ${entry.date},
         ${entry.title ?? null},
         ${entry.content},

@@ -28,17 +28,24 @@ export default function PrivacyPage() {
             where we can help it.
           </p>
 
-          <h2>What you store in the diary</h2>
+          <h2>Your account</h2>
           <p>
-            Dream entries and saved story journeys are stored in a secure cloud
-            database linked to your deployment, not only in your browser. That
-            means your archive survives clearing browser cache, as long as you
-            log in with the same diary password on the same Soma site.
+            Each person signs up with their own email and password. Dreams and
+            saved stories are stored in a secure cloud database, scoped to your
+            account—so your archive survives clearing browser cache as long as
+            you log back in.
           </p>
           <p>
             If you used an older version that kept data only in the browser,
-            any entries still in local storage are imported into the cloud
+            any entries still in local storage are imported into your cloud
             archive the first time you open the diary after an update.
+          </p>
+
+          <h2>Export and deletion</h2>
+          <p>
+            From Settings in the diary you can export your full archive as a
+            PDF, delete all dreams, or delete all repurposed stories. These
+            actions apply only to your account.
           </p>
 
           <h2>When you use “Analyse (Freud)” or Story journey</h2>
@@ -53,9 +60,8 @@ export default function PrivacyPage() {
 
           <h2>Password</h2>
           <p>
-            Access to the diary area is gated by a password you configure on the
-            server (<code>DIARY_PASSWORD</code> in your deployment). Treat it
-            like a shared secret for a private prototype—not bank-grade security.
+            Your password is stored as a one-way hash—we never keep the plain
+            text. Use a strong, unique password and keep it private.
           </p>
 
           <h2>Not medical or therapeutic advice</h2>

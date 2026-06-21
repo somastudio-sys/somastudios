@@ -1,27 +1,40 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { login } from "@/lib/diaryApi";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("reset") === "1") {
+      setSuccess("Password updated. You can log in with your new password.");
+    }
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSubmitting(true);
     try {
-      await login(password);
+      await login(email, password);
       router.push("/diary");
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Login failed. Try again.";
-      setError(message === "Incorrect password." ? "Incorrect password. Try again." : message);
+      setError(
+        message === "Incorrect email or password."
+          ? "Incorrect email or password. Try again."
+          : message
+      );
     } finally {
       setSubmitting(false);
     }
@@ -32,22 +45,48 @@ export default function LoginForm() {
       <div className="login-card">
         <div className="login-header">
           <h1>Log in</h1>
-          <p>Sign in to access your dream diary and archive.</p>
+          <p>Sign in to access your dream diary and cloud archive.</p>
         </div>
         <form className="login-form" onSubmit={handleSubmit}>
+          <label htmlFor="email">
+            Email
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+              disabled={submitting}
+              required
+            />
+          </label>
           <label htmlFor="password">
             Password
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter password"
+              autoComplete="current-password"
+              disabled={submitting}
+              required
+            />
           </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter password"
-            autoComplete="current-password"
-            disabled={submitting}
-          />
-          {error && <p className="login-error" role="alert">{error}</p>}
+          <p className="login-forgot">
+            <Link href="/forgot-password">Forgot your password?</Link>
+          </p>
+          {success ? (
+            <p className="login-success" role="status">
+              {success}
+            </p>
+          ) : null}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             className="btn btn-primary login-submit"
@@ -57,6 +96,9 @@ export default function LoginForm() {
           </button>
         </form>
         <div className="login-secondary-links">
+          <span>No account?</span>
+          <Link href="/signup">Sign up</Link>
+          <span>·</span>
           <Link href="/">← Back to home</Link>
         </div>
       </div>

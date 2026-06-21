@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import type { RepurposedStory } from "@/lib/privateStoriesStorage";
 import { migrateStories } from "@/lib/storiesDb";
-import { requireDiarySession } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
 
 export async function POST(req: Request) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
   );
 
   try {
-    const imported = await migrateStories(valid);
+    const imported = await migrateStories(userId, valid);
     return NextResponse.json({ imported });
   } catch (err) {
     return NextResponse.json(

@@ -32,11 +32,11 @@ const siteUrl =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Soma Studios — Dream diary",
+    default: "Soma Studios — The AI dream analysis app",
     template: "%s | Soma Studios",
   },
   description:
-    "A softer home for your dreams. Capture what you see at night and return to it with gentle Freudian insight.",
+    "Tell Soma your dream. Get Freudian AI analysis back. Turn it into a branching story—stored privately in your browser.",
   openGraph: {
     type: "website",
     locale: "en",
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Soma Studios — Dream diary",
+    title: "Soma Studios — The AI dream analysis app",
     description:
-      "A softer home for your dreams. Freudian-style reflection, in your browser.",
+      "Tell Soma your dream. Get Freudian AI analysis back. Turn it into a branching story.",
   },
 };
 

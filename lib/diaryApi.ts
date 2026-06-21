@@ -9,16 +9,64 @@ async function readJson<T>(res: Response): Promise<T> {
   return data;
 }
 
-export async function fetchSession(): Promise<{ authenticated: boolean }> {
+export type SessionInfo = {
+  authenticated: boolean;
+  email?: string;
+};
+
+export async function fetchSession(): Promise<SessionInfo> {
   const res = await fetch("/api/auth/session", { cache: "no-store" });
   return readJson(res);
 }
 
-export async function login(password: string): Promise<void> {
+export async function signup(email: string, password: string): Promise<{ email: string }> {
+  const res = await fetch("/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await readJson<{ email: string }>(res);
+  return { email: data.email };
+}
+
+export async function login(email: string, password: string): Promise<void> {
   const res = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ password }),
+    body: JSON.stringify({ email, password }),
+  });
+  await readJson(res);
+}
+
+export async function requestPasswordReset(
+  email: string
+): Promise<{ message: string; devResetUrl?: string }> {
+  const res = await fetch("/api/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await readJson<{ message: string; devResetUrl?: string }>(res);
+  return { message: data.message, devResetUrl: data.devResetUrl };
+}
+
+export async function validateResetToken(token: string): Promise<boolean> {
+  const res = await fetch(
+    `/api/auth/reset-password?token=${encodeURIComponent(token)}`,
+    { cache: "no-store" }
+  );
+  const data = await readJson<{ valid: boolean }>(res);
+  return data.valid;
+}
+
+export async function resetPassword(
+  token: string,
+  password: string
+): Promise<void> {
+  const res = await fetch("/api/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password }),
   });
   await readJson(res);
 }
@@ -70,6 +118,12 @@ export async function deleteDreamApi(id: string): Promise<void> {
   await readJson(res);
 }
 
+export async function deleteAllDreamsApi(): Promise<number> {
+  const res = await fetch("/api/account/dreams", { method: "DELETE" });
+  const data = await readJson<{ deleted: number }>(res);
+  return data.deleted;
+}
+
 export async function migrateDreamsApi(entries: DreamEntry[]): Promise<number> {
   const res = await fetch("/api/dreams/migrate", {
     method: "POST",
@@ -115,6 +169,12 @@ export async function deleteStoryApi(id: string): Promise<void> {
     method: "DELETE",
   });
   await readJson(res);
+}
+
+export async function deleteAllStoriesApi(): Promise<number> {
+  const res = await fetch("/api/account/stories", { method: "DELETE" });
+  const data = await readJson<{ deleted: number }>(res);
+  return data.deleted;
 }
 
 export async function migrateStoriesApi(

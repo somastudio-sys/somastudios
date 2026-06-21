@@ -1,15 +1,15 @@
 import { NextResponse } from "next/server";
 import { createStory, listStories } from "@/lib/storiesDb";
-import { requireDiarySession } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   try {
-    const stories = await listStories();
+    const stories = await listStories(userId);
     return NextResponse.json({ stories });
   } catch (err) {
     return NextResponse.json(
@@ -20,8 +20,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const story = await createStory({
+    const story = await createStory(userId, {
       title: typeof body.title === "string" ? body.title : "Untitled story",
       genre,
       dreamId: typeof body.dreamId === "string" ? body.dreamId : undefined,

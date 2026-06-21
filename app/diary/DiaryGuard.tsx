@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import DiaryNav from "@/components/DiaryNav";
 import { fetchSession } from "@/lib/diaryApi";
 
 export default function DiaryGuard({
@@ -11,14 +12,16 @@ export default function DiaryGuard({
 }) {
   const router = useRouter();
   const [allowed, setAllowed] = useState(false);
+  const [email, setEmail] = useState<string | undefined>();
 
   useEffect(() => {
     let cancelled = false;
     fetchSession()
-      .then(({ authenticated }) => {
+      .then(({ authenticated, email: sessionEmail }) => {
         if (cancelled) return;
         if (authenticated) {
           setAllowed(true);
+          setEmail(sessionEmail);
         } else {
           router.replace("/login");
         }
@@ -50,6 +53,7 @@ export default function DiaryGuard({
     <div className="diary-theme">
       <div className="stars" aria-hidden="true" />
       <div className="twinkling" aria-hidden="true" />
+      <DiaryNav email={email} />
       {children}
     </div>
   );

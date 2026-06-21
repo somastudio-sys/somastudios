@@ -1,15 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PodcastSpotlight from "@/components/PodcastSpotlight";
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
+import { getPodcastChannelUrl } from "@/lib/podcastFeed";
 
-const podcastUrl = process.env.NEXT_PUBLIC_PODCAST_URL?.trim();
+const podcastUrl = getPodcastChannelUrl();
 
 export const metadata: Metadata = {
-  title: "A softer home for your dreams",
+  title: "The AI dream analysis app",
   description:
-    "Dream diary and gentle Freudian-style reflection in your browser. Password-protected, private by default.",
+    "Tell Soma your dream. Get Freudian AI analysis back. Turn it into a branching story—stored privately in your browser.",
 };
+
+export const revalidate = 3600;
 
 export default function Home() {
   return (
@@ -18,30 +22,27 @@ export default function Home() {
         <SiteNav variant="home" />
         <section className="hero">
           <div className="hero-copy">
-            <span className="hero-kicker">Dream diary · Freudian analysis</span>
-            <h1 className="hero-title">A softer home for your dreams.</h1>
+            <span className="hero-kicker">The AI dream analysis app</span>
+            <h1 className="hero-title">
+              Your dreams mean something. Find out what.
+            </h1>
             <p className="hero-subtitle">
-              Capture what you see at night and return to it with gentle
-              Freudian insight.
+              Tell Soma your dream. Get Freudian AI analysis back. Then turn it
+              into a branching story you navigate yourself — stored privately in
+              your browser.
             </p>
             <div className="hero-actions">
               <Link href="/login" className="btn btn-primary hero-primary">
                 Log in to diary
               </Link>
-              {podcastUrl ? (
-                <a
-                  href={podcastUrl}
-                  className="btn btn-ghost hero-secondary"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Listen to the podcast
-                </a>
-              ) : (
-                <Link href="/blog" className="btn btn-ghost hero-secondary">
-                  Read the journal
-                </Link>
-              )}
+              <a
+                href={podcastUrl}
+                className="btn btn-ghost hero-secondary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Listen to the podcast
+              </a>
             </div>
             <p className="hero-meta">
               Password-protected diary · In your browser · Private by default
@@ -147,55 +148,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section
-        id="testimonials"
-        className="info-section testimonials-section info-section--alt"
-      >
-        <div className="info-inner">
-          <h2>Customer testimonials</h2>
-          <div className="testimonial-carousel" aria-label="Customer testimonials">
-            <article className="testimonial-card">
-              <p className="testimonial-quote">
-                &ldquo;Soma gave my dreams somewhere gentle to land. It turned a
-                scattered notes app into a nightly ritual I actually look
-                forward to.&rdquo;
-              </p>
-              <p className="testimonial-name">Dreamer, London</p>
-            </article>
-            <article className="testimonial-card">
-              <p className="testimonial-quote">
-                &ldquo;The Freudian prompts helped me spot symbols and patterns
-                I&rsquo;d been circling for years. It feels like having a quiet
-                analyst in my pocket.&rdquo;
-              </p>
-              <p className="testimonial-name">Artist, Berlin</p>
-            </article>
-            <article className="testimonial-card">
-              <p className="testimonial-quote">
-                &ldquo;Revisiting old entries in Soma feels like screening a
-                private film of my subconscious. It&rsquo;s become the calmest
-                part of my evening.&rdquo;
-              </p>
-              <p className="testimonial-name">Writer, New York</p>
-            </article>
-            <article className="testimonial-card">
-              <p className="testimonial-quote">
-                &ldquo;I started recording dreams as an experiment. Soma turned
-                it into a practice that quietly anchors my week.&rdquo;
-              </p>
-              <p className="testimonial-name">Researcher, Toronto</p>
-            </article>
-            <article className="testimonial-card">
-              <p className="testimonial-quote">
-                &ldquo;There&rsquo;s something about seeing months of dreams in
-                one private place that makes my inner life feel held, not
-                chaotic.&rdquo;
-              </p>
-              <p className="testimonial-name">Designer, Copenhagen</p>
-            </article>
-          </div>
-        </div>
-      </section>
+      <PodcastSpotlight />
 
       <SiteFooter />
 

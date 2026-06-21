@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import type { DreamEntry } from "@/app/diary/types";
 import { createDream, listDreams } from "@/lib/dreamsDb";
-import { requireDiarySession } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
   try {
-    const dreams = await listDreams();
+    const dreams = await listDreams(userId);
     return NextResponse.json({ dreams });
   } catch (err) {
     return NextResponse.json(
@@ -21,8 +21,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       : new Date().toISOString().slice(0, 10);
 
   try {
-    const dream = await createDream({
+    const dream = await createDream(userId, {
       id: typeof body.id === "string" ? body.id : undefined,
       createdAt: typeof body.createdAt === "string" ? body.createdAt : undefined,
       date,

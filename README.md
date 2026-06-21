@@ -41,29 +41,34 @@ Optional: set `OPENAI_MODEL` to another chat model if your account supports it. 
 
 **Story journey:** After you run **Analyse (Freud)** on a dream, use **Story journey** to pick a genre and build a choose-your-path short story from the dream and analysis (same `OPENAI_API_KEY`, `POST /api/story`).
 
-**Public journal (`/blog`):** Marketing posts for the product (edit `app/blog/MarketingBlogClient.tsx`).
+**Public journal (`/blog`):** Markdown posts in `content/blog/` — copy `_template.md`, add a new `.md` file, deploy. RSS at `/blog/rss.xml`.
 
 **Private repurposed stories (`/diary/stories`, login required):** After a story journey, **Save to my stories** stores fiction in your cloud archive (Postgres), same as dreams.
 
 ## Cloud archive (permanent storage)
 
-Dreams and saved stories are stored in **Vercel Postgres** (Neon), not in the browser. Clearing cache will not delete them once `POSTGRES_URL` is configured.
+Dreams and saved stories are stored in **Vercel Postgres** (Neon), scoped to each user account—not in the browser. Clearing cache will not delete them once `POSTGRES_URL` is configured.
 
 **Local setup**
 
 1. Create a Postgres database in [Vercel Storage](https://vercel.com/docs/storage) (or use an existing Neon project).
 2. Copy `.env.example` → `.env.local` and set:
    - `POSTGRES_URL` — from Vercel/Neon (required)
-   - `DIARY_PASSWORD` — diary login password (defaults to `soma` if unset)
    - `DIARY_SESSION_SECRET` — 32+ random characters for the login cookie
    - `OPENAI_API_KEY` — for Analyse / Story journey
-3. Restart `npm run dev`.
+3. Restart `npm run dev`, then **Sign up** at `/signup` to create your account.
 
 **Vercel deploy**
 
-In Project → Settings → Environment Variables, add `POSTGRES_URL` (from Storage), `DIARY_PASSWORD`, `DIARY_SESSION_SECRET`, and `OPENAI_API_KEY`. Redeploy.
+In Project → Settings → Environment Variables, add `POSTGRES_URL` (from Storage), `DIARY_SESSION_SECRET`, and `OPENAI_API_KEY`. Redeploy.
 
 On first load after login, any dreams still in this browser’s old `localStorage` are imported into the cloud archive automatically.
+
+**Settings (`/diary/settings`):** Export your full archive as PDF, or delete all dreams / all repurposed stories from your account.
+
+**Forgot password:** `/forgot-password` sends a one-hour reset link. Set `RESEND_API_KEY` and `EMAIL_FROM` in production; in local dev the link is logged to the terminal if Resend is not configured.
+
+**Legacy data:** If you had dreams stored before per-user accounts, they are assigned to a legacy account (`DIARY_LEGACY_EMAIL`, password `DIARY_PASSWORD`) on first deploy after the upgrade.
 
 ## Deploy on Vercel
 

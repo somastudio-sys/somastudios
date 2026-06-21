@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { deleteStory, getStoryById } from "@/lib/storiesDb";
-import { requireDiarySession } from "@/lib/session";
+import { requireUserId } from "@/lib/session";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_req: Request, context: RouteContext) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -16,7 +16,7 @@ export async function GET(_req: Request, context: RouteContext) {
   }
 
   try {
-    const story = await getStoryById(id);
+    const story = await getStoryById(userId, id);
     if (!story) {
       return NextResponse.json({ error: "Story not found." }, { status: 404 });
     }
@@ -30,8 +30,8 @@ export async function GET(_req: Request, context: RouteContext) {
 }
 
 export async function DELETE(_req: Request, context: RouteContext) {
-  const session = await requireDiarySession();
-  if (!session) {
+  const userId = await requireUserId();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
@@ -41,7 +41,7 @@ export async function DELETE(_req: Request, context: RouteContext) {
   }
 
   try {
-    const removed = await deleteStory(id);
+    const removed = await deleteStory(userId, id);
     if (!removed) {
       return NextResponse.json({ error: "Story not found." }, { status: 404 });
     }

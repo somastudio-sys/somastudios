@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
 import LoginForm from "./LoginForm";
@@ -20,7 +21,17 @@ export default function LoginPage() {
         className="login-body"
         style={{ minHeight: "60vh", padding: "2rem 1.5rem 3rem" }}
       >
-        <LoginForm />
+        <Suspense
+          fallback={
+            <div className="login-main">
+              <div className="login-card">
+                <p className="login-note">Loading…</p>
+              </div>
+            </div>
+          }
+        >
+          <LoginForm />
+        </Suspense>
       </div>
       <SiteFooter />
     </>
