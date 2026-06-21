@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s | Soma Studios",
   },
   description:
-    "Tell Soma your dream. Get Freudian AI analysis back. Turn it into a branching story—stored privately in your browser.",
+    "Tell Soma Studios your dream. Get Freudian AI analysis back. Then build it into a branching story—stored privately in your browser.",
   openGraph: {
     type: "website",
     locale: "en",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Soma Studios — The AI dream analysis app",
     description:
-      "Tell Soma your dream. Get Freudian AI analysis back. Turn it into a branching story.",
+      "Tell Soma Studios your dream. Get Freudian AI analysis back. Then build it into a branching story.",
   },
 };
 

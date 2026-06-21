@@ -5,7 +5,7 @@ import {
 
 const SHOW_TITLE = "Soma Studios: The Dream Experiment";
 const SHOW_DESCRIPTION =
-  "Dream journalling, analysis, and creative reflection—out loud. Each episode starts with a real dream, unpacks what it might mean, then reshapes it into a genre story and a choose-your-own journey.";
+  "AI dream analysis, out loud. Each episode takes a real dream, unpacks it with Freudian thinking, then reshapes it into a genre story and a choose-your-own journey.";
 
 export default function PodcastSpotlight() {
   const spotifyUrl = getPodcastChannelUrl();

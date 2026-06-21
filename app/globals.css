@@ -455,6 +455,14 @@ main.diary {
   padding: 0 1rem;
 }
 
+.product-card-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(201, 160, 220, 0.85);
+  margin: 0 0 0.35rem;
+}
+
 .product-card h3 {
   font-family: var(--font-serif);
   font-size: 1.15rem;

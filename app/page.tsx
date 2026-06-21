@@ -10,7 +10,7 @@ const podcastUrl = getPodcastChannelUrl();
 export const metadata: Metadata = {
   title: "The AI dream analysis app",
   description:
-    "Tell Soma your dream. Get Freudian AI analysis back. Turn it into a branching story—stored privately in your browser.",
+    "Tell Soma Studios your dream. Get Freudian AI analysis back. Then build it into a branching story you navigate yourself — stored privately in your browser.",
 };
 
 export const revalidate = 3600;
@@ -27,9 +27,9 @@ export default function Home() {
               Your dreams mean something. Find out what.
             </h1>
             <p className="hero-subtitle">
-              Tell Soma your dream. Get Freudian AI analysis back. Then turn it
-              into a branching story you navigate yourself — stored privately in
-              your browser.
+              Tell Soma Studios your dream. Get Freudian AI analysis back. Then
+              build it into a branching story you navigate yourself — stored
+              privately in your browser.
             </p>
             <div className="hero-actions">
               <Link href="/login" className="btn btn-primary hero-primary">
@@ -45,7 +45,7 @@ export default function Home() {
               </a>
             </div>
             <p className="hero-meta">
-              Password-protected diary · In your browser · Private by default
+              Password-protected diary · Runs in your browser · Private by default
             </p>
           </div>
           <div className="hero-visual" aria-hidden="true">
@@ -72,11 +72,11 @@ export default function Home() {
       <section id="products" className="product-section">
         <div className="product-inner">
           <header className="product-header">
-            <h2>Soma, in four moments</h2>
+            <h2>What Soma Studios does</h2>
             <p className="product-tagline">
-              A calm diary, a gentle analysis engine, choose-your-path stories
-              inspired by your dreams, and a private archive—shown here as
-              product previews.
+              AI dream analysis, Freudian interpretation, choose-your-path story
+              journeys, and a private archive — four features, one place, nothing
+              leaves your browser.
             </p>
           </header>
           <div
@@ -91,10 +91,12 @@ export default function Home() {
                 />
               </div>
               <figcaption>
-                <h3>Nightly diary</h3>
+                <p className="product-card-label">Nightly diary</p>
+                <h3>Record your dream before it fades</h3>
                 <p>
-                  Capture what surfaced in the dark with a soft,
-                  distraction-free writing surface.
+                  A distraction-free diary built for the moment you wake up.
+                  Type it or speak it — Soma Studios saves it and holds it for
+                  when you&apos;re ready to look closer.
                 </p>
               </figcaption>
             </figure>
@@ -106,10 +108,12 @@ export default function Home() {
                 />
               </div>
               <figcaption>
-                <h3>Freudian lens</h3>
+                <p className="product-card-label">Freudian lens</p>
+                <h3>AI dream analysis drawn from Freudian thinking</h3>
                 <p>
-                  Return to your entries with gentle prompts drawn from classic
-                  psychoanalytic thinking.
+                  Submit your entry and get a Freudian AI reading back — symbols
+                  unpacked, patterns surfaced, questions worth sitting with. A
+                  lens, not a verdict.
                 </p>
               </figcaption>
             </figure>
@@ -121,11 +125,11 @@ export default function Home() {
                 />
               </div>
               <figcaption>
-                <h3>Story journeys</h3>
+                <p className="product-card-label">Story journeys</p>
+                <h3>Turn your dream into a story you navigate</h3>
                 <p>
-                  After you analyse a dream, turn it into a short interactive
-                  tale: pick a genre and branch through a few paths—then save
-                  your repurposed story.
+                  After your AI analysis, build your dream into a branching
+                  story. Pick a genre, make choices, and follow where it goes.
                 </p>
               </figcaption>
             </figure>
@@ -137,10 +141,12 @@ export default function Home() {
                 />
               </div>
               <figcaption>
-                <h3>Private archive</h3>
+                <p className="product-card-label">Private archive</p>
+                <h3>A searchable record of everything you&apos;ve dreamt</h3>
                 <p>
-                  Keep an ordered, searchable record of dreams over months and
-                  years, just for you.
+                  Every entry, every analysis, every story — stored in your
+                  browser, searchable across months and years, visible only to
+                  you.
                 </p>
               </figcaption>
             </figure>
