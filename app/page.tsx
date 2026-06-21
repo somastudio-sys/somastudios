@@ -8,9 +8,9 @@ import { getPodcastChannelUrl } from "@/lib/podcastFeed";
 const podcastUrl = getPodcastChannelUrl();
 
 export const metadata: Metadata = {
-  title: "The AI dream analysis app",
+  title: "The only dream diary that tells you what it means",
   description:
-    "Tell Soma Studios your dream. Get Freudian AI analysis back. Then build it into a branching story you navigate yourself — stored privately in your browser.",
+    "Soma Studios is an AI dream journal that analyses your dreams through a Freudian lens — then lets you build them into branching stories you navigate yourself. Private, in your browser.",
 };
 
 export const revalidate = 3600;
@@ -22,14 +22,16 @@ export default function Home() {
         <SiteNav variant="home" />
         <section className="hero">
           <div className="hero-copy">
-            <span className="hero-kicker">The AI dream analysis app</span>
+            <span className="hero-kicker">
+              The AI dream analysis app · Dream journal
+            </span>
             <h1 className="hero-title">
-              Your dreams mean something. Find out what.
+              The only dream diary that tells you what it means.
             </h1>
             <p className="hero-subtitle">
-              Tell Soma Studios your dream. Get Freudian AI analysis back. Then
-              build it into a branching story you navigate yourself — stored
-              privately in your browser.
+              Soma Studios is an AI dream journal that analyses your dreams
+              through a Freudian lens — then lets you build them into branching
+              stories you navigate yourself. Private, in your browser.
             </p>
             <div className="hero-actions">
               <Link href="/login" className="btn btn-primary hero-primary">

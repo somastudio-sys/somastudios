@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     template: "%s | Soma Studios",
   },
   description:
-    "Tell Soma Studios your dream. Get Freudian AI analysis back. Then build it into a branching story—stored privately in your browser.",
+    "Soma Studios is an AI dream journal that analyses your dreams through a Freudian lens — then lets you build them into branching stories you navigate yourself. Private, in your browser.",
   openGraph: {
     type: "website",
     locale: "en",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Soma Studios — The AI dream analysis app",
     description:
-      "Tell Soma Studios your dream. Get Freudian AI analysis back. Then build it into a branching story.",
+      "Soma Studios is an AI dream journal that analyses your dreams through a Freudian lens — then lets you build them into branching stories you navigate yourself.",
   },
 };
 
