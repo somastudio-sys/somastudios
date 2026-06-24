@@ -4,7 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { requestPasswordReset } from "@/lib/diaryApi";
 
-export default function ForgotPasswordForm() {
+type ForgotPasswordFormProps = {
+  emailConfigured: boolean;
+  devFallbackEnabled: boolean;
+};
+
+export default function ForgotPasswordForm({
+  emailConfigured,
+  devFallbackEnabled,
+}: ForgotPasswordFormProps) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -38,6 +46,19 @@ export default function ForgotPasswordForm() {
             Enter your email and we&apos;ll send you a link to choose a new
             password.
           </p>
+          {!emailConfigured && !devFallbackEnabled ? (
+            <p className="login-note login-note--warn" role="status">
+              Password reset email isn&apos;t configured on this site yet. Ask the
+              site owner to set <code>RESEND_API_KEY</code> in Vercel, or enable
+              temporary on-screen reset links.
+            </p>
+          ) : null}
+          {devFallbackEnabled && !emailConfigured ? (
+            <p className="login-note" role="status">
+              Email isn&apos;t configured — after you submit, your reset link
+              will appear on this page.
+            </p>
+          ) : null}
         </div>
         <form className="login-form" onSubmit={handleSubmit}>
           <label htmlFor="forgot-email">

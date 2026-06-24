@@ -188,3 +188,16 @@ export async function migrateStoriesApi(
   const data = await readJson<{ imported: number }>(res);
   return data.imported;
 }
+
+export type LegacyMergeResult = {
+  email: string;
+  dreamsMoved: number;
+  dreamsRenamed: number;
+  storiesMoved: number;
+  storiesRenamed: number;
+};
+
+export async function mergeLegacyArchiveApi(): Promise<LegacyMergeResult> {
+  const res = await fetch("/api/account/merge-legacy", { method: "POST" });
+  return readJson<LegacyMergeResult & { ok: true }>(res);
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
+import { isEmailConfigured } from "@/lib/email";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
 export const metadata: Metadata = {
@@ -10,6 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function ForgotPasswordPage() {
+  const emailConfigured = isEmailConfigured();
+  const devFallbackEnabled =
+    process.env.PASSWORD_RESET_DEV_FALLBACK === "true";
+
   return (
     <>
       <header className="site-header site-header--page">
@@ -19,7 +24,10 @@ export default function ForgotPasswordPage() {
         className="login-body"
         style={{ minHeight: "60vh", padding: "2rem 1.5rem 3rem" }}
       >
-        <ForgotPasswordForm />
+        <ForgotPasswordForm
+          emailConfigured={emailConfigured}
+          devFallbackEnabled={devFallbackEnabled}
+        />
       </div>
       <SiteFooter />
     </>

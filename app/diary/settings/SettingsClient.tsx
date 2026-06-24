@@ -7,6 +7,7 @@ import {
   fetchDreams,
   fetchSession,
   fetchStories,
+  mergeLegacyArchiveApi,
 } from "@/lib/diaryApi";
 import { exportArchivePdf } from "@/lib/exportPdf";
 
@@ -19,6 +20,7 @@ export default function SettingsClient() {
   const [exporting, setExporting] = useState(false);
   const [deletingDreams, setDeletingDreams] = useState(false);
   const [deletingStories, setDeletingStories] = useState(false);
+  const [mergingLegacy, setMergingLegacy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const refreshCounts = useCallback(async () => {
@@ -112,6 +114,38 @@ export default function SettingsClient() {
     }
   }
 
+  async function handleMergeLegacy() {
+    if (
+      !confirm(
+        "Import all dreams and stories from the pre-account legacy archive into your account? This is safe to run once."
+      )
+    ) {
+      return;
+    }
+    setMergingLegacy(true);
+    setMessage(null);
+    setError(null);
+    try {
+      const result = await mergeLegacyArchiveApi();
+      await refreshCounts();
+      const dreamPart =
+        result.dreamsMoved === 0
+          ? "no dreams"
+          : `${result.dreamsMoved} dream${result.dreamsMoved === 1 ? "" : "s"}`;
+      const storyPart =
+        result.storiesMoved === 0
+          ? "no stories"
+          : `${result.storiesMoved} stor${result.storiesMoved === 1 ? "y" : "ies"}`;
+      setMessage(`Imported ${dreamPart} and ${storyPart} from the legacy archive.`);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Could not import legacy archive."
+      );
+    } finally {
+      setMergingLegacy(false);
+    }
+  }
+
   return (
     <div className="diary-settings-page">
       <header className="diary-settings-header">
@@ -136,6 +170,23 @@ export default function SettingsClient() {
                 {message}
               </p>
             ) : null}
+
+            <section className="diary-settings-card">
+              <h2>Import legacy archive</h2>
+              <p>
+                If you used the diary before email accounts were added, your
+                older cloud dreams may still be on the legacy archive. Import
+                them into {email ? <strong>{email}</strong> : "your account"}.
+              </p>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleMergeLegacy}
+                disabled={mergingLegacy || loading}
+              >
+                {mergingLegacy ? "Importing…" : "Import legacy archive"}
+              </button>
+            </section>
 
             <section className="diary-settings-card">
               <h2>Export archive</h2>

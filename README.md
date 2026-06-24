@@ -68,7 +68,7 @@ On first load after login, any dreams still in this browser’s old `localStorag
 
 **Forgot password:** `/forgot-password` sends a one-hour reset link. Set `RESEND_API_KEY` and `EMAIL_FROM` in production; in local dev the link is logged to the terminal if Resend is not configured.
 
-**Legacy data:** If you had dreams stored before per-user accounts, they are assigned to a legacy account (`DIARY_LEGACY_EMAIL`, password `DIARY_PASSWORD`) on first deploy after the upgrade.
+**Legacy data:** If you had dreams stored before per-user accounts, they are assigned to a legacy account (`DIARY_LEGACY_EMAIL`, password `DIARY_PASSWORD`) on first deploy after the upgrade. Log in to your account and use **Import legacy archive** in `/diary/settings` to move them into your email account.
 
 ## Deploy on Vercel
 

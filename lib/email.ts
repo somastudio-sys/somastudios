@@ -1,8 +1,19 @@
 type SendResult = {
   sent: boolean;
-  /** True when no email provider is configured (local dev). */
+  /** True when no email provider is configured (local dev / emergency fallback). */
   devFallback?: boolean;
 };
+
+export function isEmailConfigured(): boolean {
+  return Boolean(process.env.RESEND_API_KEY?.trim());
+}
+
+function allowPasswordResetDevFallback(): boolean {
+  return (
+    process.env.NODE_ENV === "development" ||
+    process.env.PASSWORD_RESET_DEV_FALLBACK === "true"
+  );
+}
 
 export async function sendPasswordResetEmail(
   to: string,
@@ -13,7 +24,7 @@ export async function sendPasswordResetEmail(
     process.env.EMAIL_FROM?.trim() || "Soma <onboarding@resend.dev>";
 
   if (!apiKey) {
-    if (process.env.NODE_ENV === "development") {
+    if (allowPasswordResetDevFallback()) {
       console.log(
         `[password-reset] RESEND_API_KEY not set — reset link for ${to}:\n${resetUrl}`
       );
@@ -48,7 +59,7 @@ export async function sendPasswordResetEmail(
   if (!res.ok) {
     const body = await res.text();
     console.error("[password-reset] Resend error:", res.status, body);
-    if (process.env.NODE_ENV === "development") {
+    if (allowPasswordResetDevFallback()) {
       return { sent: false, devFallback: true };
     }
     return { sent: false };

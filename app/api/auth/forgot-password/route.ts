@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { isEmailConfigured, sendPasswordResetEmail } from "@/lib/email";
 import {
   generateResetToken,
   hashResetToken,
@@ -30,15 +30,21 @@ export async function POST(req: Request) {
 
     if (user) {
       const token = generateResetToken();
-      const tokenHash = hashResetToken(token);
-      const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString();
-      await setPasswordResetToken(user.id, tokenHash, expiresAt);
-
       const resetUrl = `${getSiteUrl(req)}/reset-password?token=${encodeURIComponent(token)}`;
       const emailResult = await sendPasswordResetEmail(user.email, resetUrl);
 
-      if (emailResult.devFallback) {
-        devResetUrl = resetUrl;
+      if (emailResult.sent || emailResult.devFallback) {
+        const tokenHash = hashResetToken(token);
+        const expiresAt = new Date(Date.now() + RESET_TOKEN_TTL_MS).toISOString();
+        await setPasswordResetToken(user.id, tokenHash, expiresAt);
+
+        if (emailResult.devFallback) {
+          devResetUrl = resetUrl;
+        }
+      } else if (!isEmailConfigured()) {
+        console.error(
+          "[api/auth/forgot-password] RESEND_API_KEY not set in production — reset email not sent."
+        );
       }
     }
 
@@ -46,7 +52,9 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: true,
         message:
-          "Email isn't configured for local dev. Use the reset link below (also printed in your terminal).",
+          process.env.NODE_ENV === "development"
+            ? "Email isn't configured for local dev. Use the reset link below (also printed in your terminal)."
+            : "Your reset link is below. It expires in one hour.",
         devResetUrl,
       });
     }
