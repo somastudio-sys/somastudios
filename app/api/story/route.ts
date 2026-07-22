@@ -1,125 +1,62 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 
-/** Tight genre rules — models drift to bland neutral prose without this. Keys match `GENRES[].id` in the diary UI. */
+/** Genre style rules — voice/diction only. Dream plot always wins over these. Keys match `GENRES[].id` in the diary UI. */
 const GENRE_CONTRACTS: Record<string, string> = {
-  noir: `NOIR / HARD-BOILED (mandatory style — this is NOT generic fiction):
-- Setting & texture: night, city, rain or dry heat haze, cheap rooms, alleys, neon, smoke, shadows, institutional rot, moral grey zones. Anchor at least two concrete noir images per segment (e.g. wet asphalt, desk lamp, bruised sky, filing cabinet, last cigarette).
-- Voice: spare, cynical, weary; short punchy sentences mixed with longer fatalistic ones; vernacular allowed; suspicion and doubt drive the prose.
-- Themes: betrayal, secrecy, lust-as-trap, corruption, the case that isn’t what it seems.
-- POV: first-person hard-boiled OR tight third on a jaded investigator or cornered protagonist.
-- FORBIDDEN in this genre: cozy warmth as default tone, pastoral fairy-tale openings, high fantasy (thrones, spells, elves), space stations, mythic omniscient bard voice, inspirational self-help cadence.
-- If the prose could be mistaken for a cozy procedural or “dream journal,” rewrite until the noir register is unmistakable.`,
+  horror: `HORROR (mandatory style — voice only; dream plot still leads):
+- Atmosphere: dread, the uncanny, threat, isolation, wrongness in familiar places; sensory detail that unsettles (sound, cold, wrong scale, something watching).
+- Pace: tension that builds; implication over gore; fear of what comes next.
+- Voice: tight third-person; spare or creeping sentences; the world feels unsafe.
+- FORBIDDEN default: cozy warmth, romcom banter, slapstick comedy, pure puzzle-box mystery with no fear.`,
 
-  detective: `DETECTIVE / PROCEDURAL (mandatory style — not the same as noir atmosphere):
-- Engine: clues, interviews, timelines, deduction, evidence, suspects, alibis, case theory that shifts as facts surface.
-- Texture: stations, case boards, forensics detail at a readable level, notebooks, surveillance stills, autopsy summaries (tasteful), warrants, jurisdiction friction.
-- Voice: clear, observant third-person or tight third on the investigator; competence and doubt in balance—less fatalistic lyricism than noir, more method and revelation.
-- FORBIDDEN default: pure gothic haunting with no investigation; space-opera set dressing; romance-first plot with no mystery spine.`,
+  mystery: `MYSTERY (mandatory style — voice only; dream plot still leads):
+- Engine: questions, clues, withheld information, deduction, revelation; what isn’t said matters as much as what is.
+- Texture: observation, contradiction, timing, evidence hidden in ordinary dream details — do not invent a police case the dream never had.
+- Voice: clear, observant third-person; curiosity and unease in balance.
+- FORBIDDEN default: pure slapstick, romance-first with no unanswered question, horror gore without investigation of the unknown.`,
 
-  thriller: `THRILLER (mandatory style):
-- Pace: urgency, jeopardy, reversals, narrow escapes, deadlines, competence under pressure; each segment should raise or twist physical or psychological stakes.
-- Texture: pursuit, surveillance, ticking clock, encrypted message, safe house, chase geography, weapon as Chekhov’s gun (threat > gore), conspiracy glimpsed through partial information.
-- Tone: lean, propulsive sentences mixed with breath-holding stillness; dread of what comes next.
-- FORBIDDEN default: cozy pastoral slice-of-life, mythic-fable omniscience, or pure puzzle-box detective with zero bodily peril unless the dream clearly demands cold procedural only.`,
+  suspense: `SUSPENSE (mandatory style — voice only; dream plot still leads):
+- Engine: anticipation, delayed payoff, rising stakes, “something is about to happen”; each beat tightens the screw.
+- Texture: ticking pressure, watched spaces, narrow choices, silence before the turn; peril felt more than shown.
+- Voice: lean, propulsive; breath-holding stillness mixed with urgency.
+- FORBIDDEN default: relaxed comedy, cozy resolution early, leisurely slice-of-life with no mounting tension.`,
 
-  dystopian: `DYSTOPIAN (mandatory style):
-- World: collapsed or authoritarian order—surveillance, rationing, ruined infrastructure, propaganda, cult-of-compliance, underground resistance whispers, environmental decay tied to power.
-- Anchor each segment in how the system touches bodies and choices (permits, checkpoints, curated truth, scarcity), not vague “bad future.”
-- Voice: weary, defiant, or numb clarity; moral grey without nihilistic edgelord posturing.
-- FORBIDDEN default: cozy nostalgia, high-fantasy spellcraft as main engine, pure space wonder without oppression texture, romcom banter as default.`,
+  romance: `ROMANCE (mandatory style — voice only; dream plot still leads):
+- Center emotional tension between characters who appear in the dream: desire, obstacle, vulnerability, misunderstanding, closeness or parting.
+- Intimacy: emotional and sensory; keep explicit sex off-page — use tension and aftermath.
+- Voice: warm, yearning, conflicted, or wistful.
+- FORBIDDEN default: pure horror dread, comedy that mocks the bond, cold procedural with no relational heart.`,
 
-  fantasy: `FANTASY (mandatory style):
-- Use recognizable fantasy texture: magic, mythic stakes, non-modern secondary-world or mythic intrusion, proper names for places/factions where fitting.
-- Voice may be epic-lyrical, sword-and-sorcery brisk, or mythic-fairy-tale—pick one and stay consistent.
-- World logic: establish one clear magical or fantastical rule per segment when introducing new elements.
-- FORBIDDEN default: pure slice-of-life realism with zero fantastical charge; hard-boiled noir monologue; hard SF tech exposition unless the dream clearly blends genres.`,
-  scifi: `SCIENCE FICTION (mandatory style):
-- Anchor every segment in speculative premise: future tech, space, AI, biotech, time dilation, climate collapse, etc.—be concrete (ship systems, interfaces, physics consequences), not vague “futuristic.”
-- Voice: analytical, precise, or coldly lyrical; wonder and dread tied to implication of science/tech.
-- Worldbuilding: one new speculative detail per beat where useful; avoid magic-wand solutions.
-- FORBIDDEN as primary mode: high fantasy spellcraft, noir-only atmosphere with no SFnal idea, mythic fable tone without speculative premise.`,
-
-  gothic: `GOTHIC HORROR (mandatory style):
-- Atmosphere: dread, decay, the uncanny, isolation, family/ancestral guilt, storms, liminal architecture (manor, chapel, sea-cliff, crypt).
-- Sensory palette: cold, mould, candle-flame, blood as implication, sound in empty space.
-- Pace: slow dread and revelation; avoid action-movie beats unless the dream demands.
-- FORBIDDEN default: cozy romance, noir gumshoe voice, space opera, ironic sitcom tone.`,
-  romance: `ROMANCE (mandatory style):
-- Center emotional tension between characters: desire, obstacle, vulnerability, misunderstanding, reconciliation or tragic parting.
-- Intimacy: emotional and sensory closeness; keep explicit sex off-page per safety rules—use tension and aftermath.
-- Voice: warm, yearning, conflicted, or wistful—not cynical noir by default.
-- FORBIDDEN default: pure horror dread, hard-boiled investigation, or cold SF concept piece with no relational heart.`,
-
-  inspirational: `INSPIRATIONAL (mandatory style):
-- Engine: earned hope, courage under fear, small decisive acts that matter, repair and renewal—uplift must come from concrete scenes and choices, not slogans.
-- Voice: sincere, clear third-person; warmth and gravity in balance; allow struggle on the page so the turn toward light feels deserved.
-- FORBIDDEN default: hollow self-help platitudes (“everything happens for a reason”), preachy sermonizing, toxic positivity that erases cost, cynical noir default, gothic dread as main note.`,
-
-  lighthearted: `LIGHT-HEARTED (mandatory style):
-- Engine: gentle wit, playful mishaps, low-stakes charm, comic relief that never humiliates; the world is basically kind or absurd in a fond way.
-- Voice: buoyant, rhythmic, smiling third-person; banter and situational comedy without bite or satirical cruelty.
-- FORBIDDEN default: dystopian oppression, tragedy spiral, noir cynicism, savage satire, horror dread, gritty thriller jeopardy as the dominant texture.`,
-
-  feelgood: `FEEL-GOOD (mandatory style):
-- Engine: comfort, reconciliation, deserved kindness, “weight lifts” moments, found-family or renewed belonging—payoff should feel satisfying and humane.
-- Texture: sensory coziness where fitting (warm light, food shared, laughter), honest apologies, second chances that land.
-- FORBIDDEN default: ironic twist that punishes the reader, bleak nihilism, procedural coldness, tragedy-first framing, satirical takedown energy.`,
-
-  satire: `SATIRE (mandatory style):
-- Target: institutions, vanities, hypocrisies, and absurd rules—exaggerate until the flaw is unmistakable; keep real-world protected groups out of the punchline; punch up at power, not down at marginalization.
-- Voice: ironic, deadpan, or biting wit; juxtaposition of official language vs lived reality; bureaucratic euphemism played straight.
-- Each segment should sharpen the critique through concrete scene business, not essayistic moralizing.
-- FORBIDDEN default: neutral realism with no bite, pure horror dread, earnest romance with no ironic frame unless the dream clearly isn’t satirical.`,
-
-  tragedy: `TRAGEDY (mandatory style):
-- Shape: inevitable consequence, irreversible choice, noble intention colliding with flaw or fate; weight and solemnity without melodrama clichés (“it was all a dream” cop-out).
-- Tone: foreboding, cathartic dread, moral cost made concrete through action and image; allow quiet devastation.
-- Avoid cheap reversal into comedy or cozy resolution unless the user’s dream explicitly demands ambiguity—still keep tragic gravity dominant.
-- FORBIDDEN default: sitcom banter, puzzle-box cozy mystery, space-opera wonder, ironic satire as the primary register.`,
-
-  magical: `MAGICAL REALISM (mandatory style):
-- Everyday world + impossible events treated as matter-of-fact; no high-fantasy quest framing.
-- Political/historical undertone optional; family and memory often central; one strange image carries symbolic weight.
-- Tone: calm narration of the uncanny; avoid epic fantasy diction (“realm,” “prophecy”) unless ironic.
-- FORBIDDEN default: spaceships, noir casefile, gothic haunted-house-only without social texture.`,
-  myth: `MYTH / FABLE (mandatory style):
-- Timeless, oral-tradition cadence; archetypes (stranger, king, beast, threshold); repetition and parallelism welcome.
-- Diction slightly elevated but clear; distance from modern slang unless archly.
-- Structure: moral or cosmic consequence visible in the weave of events.
-- FORBIDDEN default: contemporary detective noir, technical SF, domestic realism without mythic frame.`,
+  comedy: `COMEDY (mandatory style — voice only; dream plot still leads):
+- Engine: wit, absurdity, mishaps, ironic timing, comic friction between characters or situations — drawn from the dream’s own oddness, not a sitcom set-piece.
+- Voice: buoyant or deadpan; playful third-person; laughter without cruelty.
+- FORBIDDEN default: gothic dread as main note, tragedy spiral, grim thriller jeopardy as the dominant texture.`,
 };
 
-const DEFAULT_GENRE_CONTRACT = `Match the genre label the user chose with unmistakable voice, setting, and diction. Do not write neutral “could be anything” prose—genre must be obvious from wording alone.`;
+const DEFAULT_GENRE_CONTRACT = `Match the genre label with unmistakable voice and diction while staging the dream's own scenes. Do not invent a different plot to "fit" the genre.`;
 
 const GENRE_ANCHORS: Record<string, string[]> = {
-  noir: ["neon", "wet asphalt", "case file", "smoke", "alley"],
-  detective: ["alibis", "evidence bag", "interview room", "timeline", "warrant"],
-  thriller: ["deadline", "pursuit", "safe house", "surveillance", "breath held"],
-  dystopian: ["checkpoint", "ration card", "curfew", "propaganda screen", "black market"],
-  fantasy: ["spell", "sigil", "ruin", "kingdom", "oracle"],
-  scifi: [
-    "airlock",
-    "orbital",
-    "quantum",
-    "telemetry",
-    "cryo",
-    "drone swarm",
-    "biosensor",
-    "synthetic intelligence",
-    "reactor",
-    "time dilation",
-  ],
-  gothic: ["manor", "crypt", "candle", "storm", "ancestral portrait"],
+  horror: ["shadow", "cold breath", "wrong silence", "threshold", "watched"],
+  mystery: ["clue", "contradiction", "half-answer", "timeline", "hidden detail"],
+  suspense: ["held breath", "deadline", "footsteps", "narrow escape", "almost"],
   romance: ["longing", "confession", "touch", "distance", "reconciliation"],
-  inspirational: ["second chance", "steadier breath", "hand offered", "quiet resolve", "dawn light"],
-  lighthearted: ["grin", "harmless chaos", "banter", "shrug", "sunny room"],
-  feelgood: ["warm drink", "laughter returned", "reunion", "weight lifts", "belonging"],
-  satire: ["euphemism", "committee", "memo", "photo op", "compliance training"],
-  tragedy: ["oath", "reckoning", "last chance", "cost paid", "silence after"],
-  magical: ["ordinary street", "impossible omen", "family memory"],
-  myth: ["threshold", "omen", "oath", "beast", "oracle"],
+  comedy: ["timing", "mishap", "banter", "absurd detail", "grin"],
 };
+
+const LABEL_TO_GENRE: [string, string][] = [
+  ["horror", "horror"],
+  ["gothic", "horror"],
+  ["mystery", "mystery"],
+  ["detective", "mystery"],
+  ["suspense", "suspense"],
+  ["suspence", "suspense"],
+  ["thriller", "suspense"],
+  ["romance", "romance"],
+  ["comedy", "comedy"],
+  ["light-hearted", "comedy"],
+  ["lighthearted", "comedy"],
+  ["satire", "comedy"],
+];
 
 function resolveGenreContract(genreId: string | undefined, genreLabel: string): string {
   const id = typeof genreId === "string" ? genreId.trim().toLowerCase() : "";
@@ -127,31 +64,7 @@ function resolveGenreContract(genreId: string | undefined, genreLabel: string): 
     return GENRE_CONTRACTS[id];
   }
   const label = genreLabel.trim().toLowerCase();
-  const labelToId: [string, string][] = [
-    ["magical realism", "magical"],
-    ["science fiction", "scifi"],
-    ["sci-fi", "scifi"],
-    ["noir / detective", "noir"],
-    ["noir", "noir"],
-    ["detective", "detective"],
-    ["thriller", "thriller"],
-    ["dystopian", "dystopian"],
-    ["fantasy", "fantasy"],
-    ["gothic", "gothic"],
-    ["horror", "gothic"],
-    ["romance", "romance"],
-    ["light-hearted", "lighthearted"],
-    ["lighthearted", "lighthearted"],
-    ["feel-good", "feelgood"],
-    ["feel good", "feelgood"],
-    ["feelgood", "feelgood"],
-    ["inspirational", "inspirational"],
-    ["satire", "satire"],
-    ["tragedy", "tragedy"],
-    ["myth", "myth"],
-    ["fable", "myth"],
-  ];
-  for (const [needle, key] of labelToId) {
+  for (const [needle, key] of LABEL_TO_GENRE) {
     if (label.includes(needle)) {
       const c = GENRE_CONTRACTS[key];
       if (c) return c;
@@ -164,31 +77,7 @@ function resolveGenreKey(genreId: string | undefined, genreLabel: string): strin
   const id = typeof genreId === "string" ? genreId.trim().toLowerCase() : "";
   if (id && GENRE_CONTRACTS[id]) return id;
   const label = genreLabel.trim().toLowerCase();
-  const labelToId: [string, string][] = [
-    ["magical realism", "magical"],
-    ["science fiction", "scifi"],
-    ["sci-fi", "scifi"],
-    ["noir / detective", "noir"],
-    ["noir", "noir"],
-    ["detective", "detective"],
-    ["thriller", "thriller"],
-    ["dystopian", "dystopian"],
-    ["fantasy", "fantasy"],
-    ["gothic", "gothic"],
-    ["horror", "gothic"],
-    ["romance", "romance"],
-    ["light-hearted", "lighthearted"],
-    ["lighthearted", "lighthearted"],
-    ["feel-good", "feelgood"],
-    ["feel good", "feelgood"],
-    ["feelgood", "feelgood"],
-    ["inspirational", "inspirational"],
-    ["satire", "satire"],
-    ["tragedy", "tragedy"],
-    ["myth", "myth"],
-    ["fable", "myth"],
-  ];
-  for (const [needle, key] of labelToId) {
+  for (const [needle, key] of LABEL_TO_GENRE) {
     if (label.includes(needle)) return key;
   }
   return "";
@@ -200,8 +89,8 @@ function buildStorySystem(
   genreAnchors: string[]
 ): string {
   const anchorsBlock = genreAnchors.length
-    ? `Genre anchors (must use at least 2 naturally in EACH segment and at least 1 in the choice labels combined): ${genreAnchors.join(", ")}.`
-    : "Genre anchors: use concrete diction and motifs tied to the selected genre.";
+    ? `Genre texture words (optional flavour only — use at most 1–2 if they fit WITHOUT inventing new plot locations or objects the dream did not contain): ${genreAnchors.join(", ")}.`
+    : "Genre texture: apply voice and diction from the genre contract without inventing new plot.";
 
   return `You turn dreams into short interactive fiction. Respond with valid JSON only, no markdown fences.
 
@@ -209,10 +98,31 @@ Schema:
 {"segment": string (2-5 paragraphs of story prose),
  "choices": string[] }
 
-Global rules:
+════════════════════════════════════════
+DREAM FIDELITY — STRICT RULE (HIGHEST PRIORITY)
+════════════════════════════════════════
+The user's dream is the ONLY plot source. Genre is a LENS (voice, tone, diction), never a license to invent a different story.
+
+Mandatory:
+1. Retell THIS dream's full plot: every major event, beat, place, person, object, and outcome the dreamer described, in the dream's sequence (or a clear dramatised order that still covers the whole plot by the end).
+2. Keep the dream's characters, relationships, settings, and concrete details. Rename for third-person drama only if needed; do not replace them with genre stock characters (detectives, spaceships, castles, etc.) unless the dream already contains them.
+3. Do not abandon the dream for a "better" genre story. If genre and dream conflict, KEEP THE DREAM and colour it with genre voice.
+4. Do not invent a new primary setting, conflict, or cast that the dream never established.
+5. Branching choices must be forks WITHIN the dream's ongoing situation — alternative next actions for the dream's characters in the dream's places — not escapes into unrelated genre plots.
+6. Across the full interactive story (opening + branches), the complete dream plot must be present: nothing important from the dream may be dropped.
+7. You may dramatise, heighten, and rephrase — but the reader who wrote the dream must recognise their dream's story on every page.
+
+FORBIDDEN:
+- Starting in a genre-typical world that ignores the dream's opening scene.
+- Swapping the dream's events for genre tropes (a casefile, a spaceship mission, a quest) that the dream did not contain.
+- Using Freudian analysis as a lecture or as an excuse to replace the plot with symbolism alone.
+- Being merely "inspired by" the dream while telling a different story.
+
+════════════════════════════════════════
+STRUCTURE & VOICE
+════════════════════════════════════════
 - The story has at most three branching rounds after the opening (three "what happens next?" screens), then it ends—unless the user message marks the final segment.
 - "choices": exactly 3 short labels (under 12 words each), OR [] on the final segment only.
-- Do not copy the dream verbatim; transform and dramatise it.
 - No graphic sex or gratuitous violence; keep a thoughtful tone.
 - Perspective is mandatory: third person only.
   - Never use first-person pronouns (I, me, my, we, us, our).
@@ -220,22 +130,22 @@ Global rules:
   - Keep narration and all choice labels in third-person framing.
 
 SELECTED GENRE (user-facing label): "${genreLabel}"
+Genre applies AFTER dream fidelity. Use it for atmosphere, sentence rhythm, and diction while staging the dream's own scenes.
 
-GENRE CONTRACT — obey in every segment; do not drift into a generic voice:
+GENRE CONTRACT — style only; never override dream plot:
 ${genreContract}
 
 ${anchorsBlock}
 
-Additional anti-generic constraints:
-- Ban vague filler like "something felt strange," "an unknown force," "everything changed" unless followed by concrete genre detail.
-- Choices must be specific scene actions in this genre, not abstract prompts.
-- Choice-label style contract (mandatory):
-  - Start each choice with a strong action verb.
-  - Include at least one concrete object/system/place in the same line.
-  - Avoid generic labels like "Take a chance", "Investigate", "Keep going", "Try something else", "Ask questions".
-  - Keep each label under 12 words, but make it vivid and scene-specific.
+Choice-label style:
+- Start each choice with a strong action verb.
+- Name a concrete person, place, or object FROM THE DREAM in the same line.
+- Avoid generic labels like "Take a chance", "Investigate", "Keep going", "Try something else", "Ask questions".
+- Keep each label under 12 words.
 
-Self-check before returning JSON: If a reader blind to the label could not name the genre from diction and texture alone, rewrite the segment until they could.`;
+Self-check before returning JSON (both must pass):
+1. Dream check: Could the dreamer point to their dream's events, people, and places in this segment? If not, rewrite until they could.
+2. Genre check: Does diction/texture match the selected genre WITHOUT changing whose story this is? If genre won over dream, rewrite until the dream leads.`;
 }
 
 export async function POST(request: Request) {
@@ -289,16 +199,16 @@ export async function POST(request: Request) {
     let userMessage: string;
     if (mode === "start") {
       userMessage = [
-        `You are writing ONLY in: ${genre}. The GENRE CONTRACT in your instructions is binding.`,
+        `Genre for VOICE ONLY: ${genre}. Dream plot is binding — do not invent a different story.`,
         dreamTitle ? `Working title: ${dreamTitle}` : "",
         "",
-        "Dream (source material — do not paste verbatim):",
+        "SOURCE DREAM (full plot — retell this story in third person; genre only colours how you tell it):",
         dreamContent,
         analysis
-          ? `\nFreudian reflection (optional context only — do not lecture; dramatise):\n${analysis}`
+          ? `\nFreudian reflection (optional mood only — do NOT replace the dream plot with analysis):\n${analysis}`
           : "",
         "",
-        "Begin the interactive story. Return JSON with \"segment\" and \"choices\" (3 strings). Every choice label must sound like the next beat in THIS genre, not a generic fork. Choices should read like cinematic micro-actions. Third-person only.",
+        "Begin the interactive story ON the dream's opening scene, with the dream's people and places. Cover the dream's early beats in this opening segment; later segments must continue the same dream plot through to its end. Return JSON with \"segment\" and \"choices\" (3 strings). Every choice must be a next action inside THIS dream. Third-person only.",
       ]
         .filter(Boolean)
         .join("\n");
@@ -310,10 +220,10 @@ export async function POST(request: Request) {
         );
       }
       userMessage = [
-        `Stay in genre: ${genre}. Do not soften into neutral prose.`,
+        `Genre for VOICE ONLY: ${genre}. Stay inside the SOURCE DREAM's plot — do not drift into a new story.`,
         "",
-        "Dream source (continuity only, truncated):",
-        dreamContent.slice(0, 2000),
+        "SOURCE DREAM (full plot — keep covering remaining dream beats not yet dramatised):",
+        dreamContent,
         "",
         "Story so far:",
         storySoFar,
@@ -321,8 +231,8 @@ export async function POST(request: Request) {
         `The reader chose: "${choice}"`,
         "",
         finalSegment
-          ? "This is the FINAL segment of a short branching story (the reader has already made three path choices). Bring the plot to a satisfying close in the SAME genre. Return JSON with \"segment\" and \"choices\": [] — an empty array only, no further branches. Third-person only."
-          : "Continue with the next segment in the SAME genre. Return JSON with \"segment\" and \"choices\" (exactly 3 short strings for what could happen next; each option must feel native to this genre and read like a specific action shot, not a generic prompt). Third-person only.",
+          ? "This is the FINAL segment (three path choices already made). Resolve the remaining dream plot to a close that still matches the dream's events and outcome, in genre voice. Return JSON with \"segment\" and \"choices\": [] — empty array only. Third-person only."
+          : "Continue the NEXT beat of the SOURCE DREAM (not a new adventure). Return JSON with \"segment\" and \"choices\" (exactly 3 short strings; each must name a person/place/object from the dream). Third-person only.",
       ].join("\n");
     }
 
@@ -332,8 +242,8 @@ export async function POST(request: Request) {
         { role: "system", content: systemContent },
         { role: "user", content: userMessage },
       ],
-      max_tokens: mode === "start" ? 1200 : 1400,
-      temperature: 0.72,
+      max_tokens: mode === "start" ? 1400 : 1600,
+      temperature: 0.55,
       response_format: { type: "json_object" },
     });
 

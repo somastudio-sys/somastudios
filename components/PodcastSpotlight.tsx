@@ -1,15 +1,29 @@
 import {
   getPodcastChannelUrl,
-  spotifyEmbedSrc,
+  getPodcastPlayerEmbed,
 } from "@/lib/podcastFeed";
 
 const SHOW_TITLE = "Soma Studios: The Dream Experiment";
 const SHOW_DESCRIPTION =
   "AI dream analysis, out loud. Each episode takes a real dream, unpacks it with Freudian thinking, then reshapes it into a genre story and a choose-your-own journey.";
 
-export default function PodcastSpotlight() {
+function formatEpisodeDate(iso: string): string {
+  if (!iso) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+export default async function PodcastSpotlight() {
   const spotifyUrl = getPodcastChannelUrl();
-  const embedSrc = spotifyEmbedSrc(spotifyUrl);
+  const { embedSrc, episode } = await getPodcastPlayerEmbed();
+  const episodeDate = episode?.publishedAt
+    ? formatEpisodeDate(episode.publishedAt)
+    : "";
 
   return (
     <section
@@ -25,10 +39,38 @@ export default function PodcastSpotlight() {
         </header>
 
         <article className="podcast-spotlight-card">
+          {episode ? (
+            <div className="podcast-spotlight-latest">
+              <p className="podcast-spotlight-latest-label">Latest episode</p>
+              <h3 className="podcast-spotlight-latest-title">
+                {episode.link && episode.link !== spotifyUrl ? (
+                  <a
+                    href={episode.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {episode.title}
+                  </a>
+                ) : (
+                  episode.title
+                )}
+              </h3>
+              {episodeDate ? (
+                <p className="podcast-spotlight-latest-date">
+                  <time dateTime={episode.publishedAt}>{episodeDate}</time>
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
           {embedSrc ? (
             <div className="podcast-spotlight-embed-wrap">
               <iframe
-                title={`${SHOW_TITLE} on Spotify`}
+                title={
+                  episode
+                    ? `${episode.title} on Spotify`
+                    : `${SHOW_TITLE} on Spotify`
+                }
                 src={embedSrc}
                 width="100%"
                 height="352"
@@ -41,7 +83,7 @@ export default function PodcastSpotlight() {
 
           <div className="podcast-spotlight-actions">
             <a
-              href={spotifyUrl}
+              href={episode?.link || spotifyUrl}
               className="btn btn-primary podcast-spotlight-cta"
               target="_blank"
               rel="noopener noreferrer"

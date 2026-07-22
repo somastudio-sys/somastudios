@@ -1,8 +1,8 @@
 import {
   fetchPodcastFeed,
   getPodcastChannelUrl,
+  getPodcastPlayerEmbed,
   getPodcastRssUrl,
-  spotifyEmbedSrc,
 } from "@/lib/podcastFeed";
 
 function formatEpisodeDate(iso: string): string {
@@ -20,10 +20,10 @@ export default async function PodcastFeed() {
   const rssUrl = getPodcastRssUrl();
   const channelUrl = getPodcastChannelUrl();
   const feed = rssUrl ? await fetchPodcastFeed(rssUrl) : null;
+  const { embedSrc } = await getPodcastPlayerEmbed();
 
   if (!feed && !channelUrl) return null;
 
-  const embedSrc = channelUrl ? spotifyEmbedSrc(channelUrl) : null;
   const listenUrl = channelUrl || feed?.link;
 
   return (

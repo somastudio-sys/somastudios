@@ -32,21 +32,11 @@ type SpeechRecognitionLike = {
 };
 
 const GENRES: { id: string; label: string }[] = [
-  { id: "noir", label: "Noir" },
-  { id: "detective", label: "Detective" },
-  { id: "thriller", label: "Thriller" },
-  { id: "dystopian", label: "Dystopian" },
-  { id: "fantasy", label: "Fantasy" },
-  { id: "scifi", label: "Science fiction" },
-  { id: "gothic", label: "Gothic horror" },
+  { id: "horror", label: "Horror" },
+  { id: "mystery", label: "Mystery" },
+  { id: "suspense", label: "Suspense" },
   { id: "romance", label: "Romance" },
-  { id: "inspirational", label: "Inspirational" },
-  { id: "lighthearted", label: "Light-hearted" },
-  { id: "feelgood", label: "Feel-good" },
-  { id: "satire", label: "Satire" },
-  { id: "tragedy", label: "Tragedy" },
-  { id: "magical", label: "Magical realism" },
-  { id: "myth", label: "Myth / fable" },
+  { id: "comedy", label: "Comedy" },
 ];
 
 /** After the opening, the reader gets this many "what happens next?" screens, then the story ends. */

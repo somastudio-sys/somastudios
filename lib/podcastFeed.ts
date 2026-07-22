@@ -49,10 +49,141 @@ export function getPodcastChannelUrl(): string {
   return process.env.NEXT_PUBLIC_PODCAST_URL?.trim() || DEFAULT_PODCAST_SPOTIFY_URL;
 }
 
-export function spotifyEmbedSrc(channelUrl: string): string | null {
+export function parseSpotifyShowId(channelUrl: string): string | null {
   const match = channelUrl.match(/open\.spotify\.com\/show\/([a-zA-Z0-9]+)/);
-  if (!match) return null;
-  return `https://open.spotify.com/embed/show/${match[1]}?utm_source=generator`;
+  return match?.[1] ?? null;
+}
+
+export function parseSpotifyEpisodeId(value: string): string | null {
+  const match = value.match(
+    /(?:open\.spotify\.com\/episode\/|spotify:episode:)([a-zA-Z0-9]+)/
+  );
+  return match?.[1] ?? null;
+}
+
+export function spotifyShowEmbedSrc(showId: string): string {
+  return `https://open.spotify.com/embed/show/${showId}?utm_source=generator`;
+}
+
+export function spotifyEpisodeEmbedSrc(episodeId: string): string {
+  return `https://open.spotify.com/embed/episode/${episodeId}?utm_source=generator`;
+}
+
+export function spotifyEmbedSrc(channelUrl: string): string | null {
+  const showId = parseSpotifyShowId(channelUrl);
+  if (!showId) return null;
+  return spotifyShowEmbedSrc(showId);
+}
+
+export type LatestPodcastEpisode = {
+  title: string;
+  publishedAt: string;
+  spotifyEpisodeId: string | null;
+  link: string;
+};
+
+function episodeIdFromRssItem(item: {
+  link?: string;
+  guid?: string;
+  enclosure?: { url?: string };
+  content?: string;
+  contentSnippet?: string;
+  summary?: string;
+}): string | null {
+  const candidates = [
+    item.link,
+    typeof item.guid === "string" ? item.guid : undefined,
+    item.enclosure?.url,
+    item.content,
+    item.contentSnippet,
+    item.summary,
+  ];
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const id = parseSpotifyEpisodeId(candidate);
+    if (id) return id;
+  }
+  return null;
+}
+
+async function fetchLatestSpotifyEpisodeIdFromShowEmbed(
+  showId: string
+): Promise<string | null> {
+  try {
+    const res = await fetch(spotifyShowEmbedSrc(showId), {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return null;
+    const html = await res.text();
+    return parseSpotifyEpisodeId(html);
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchLatestPodcastEpisode(): Promise<LatestPodcastEpisode | null> {
+  const rssUrl = getPodcastRssUrl();
+  const channelUrl = getPodcastChannelUrl();
+  const showId = parseSpotifyShowId(channelUrl);
+
+  if (rssUrl) {
+    try {
+      const feed = await parser.parseURL(rssUrl);
+      const items = [...(feed.items ?? [])].sort((a, b) => {
+        const aTime = new Date(a.isoDate || a.pubDate || 0).getTime();
+        const bTime = new Date(b.isoDate || b.pubDate || 0).getTime();
+        return bTime - aTime;
+      });
+      const latest = items[0];
+      if (latest) {
+        let spotifyEpisodeId = episodeIdFromRssItem(latest);
+        if (!spotifyEpisodeId && showId) {
+          spotifyEpisodeId = await fetchLatestSpotifyEpisodeIdFromShowEmbed(showId);
+        }
+        return {
+          title: latest.title?.trim() || "Latest episode",
+          publishedAt: latest.isoDate || latest.pubDate || "",
+          spotifyEpisodeId,
+          link: latest.link?.trim() || channelUrl,
+        };
+      }
+    } catch {
+      // Fall through to Spotify embed lookup.
+    }
+  }
+
+  if (!showId) return null;
+
+  const spotifyEpisodeId = await fetchLatestSpotifyEpisodeIdFromShowEmbed(showId);
+  if (!spotifyEpisodeId) return null;
+
+  return {
+    title: "Latest episode",
+    publishedAt: "",
+    spotifyEpisodeId,
+    link: `https://open.spotify.com/episode/${spotifyEpisodeId}`,
+  };
+}
+
+export async function getPodcastPlayerEmbed(): Promise<{
+  embedSrc: string | null;
+  episode: LatestPodcastEpisode | null;
+}> {
+  const channelUrl = getPodcastChannelUrl();
+  const showId = parseSpotifyShowId(channelUrl);
+  const episode = await fetchLatestPodcastEpisode();
+
+  if (episode?.spotifyEpisodeId) {
+    return {
+      embedSrc: spotifyEpisodeEmbedSrc(episode.spotifyEpisodeId),
+      episode,
+    };
+  }
+
+  return {
+    embedSrc: showId ? spotifyShowEmbedSrc(showId) : spotifyEmbedSrc(channelUrl),
+    episode,
+  };
 }
 
 export async function fetchPodcastFeed(
