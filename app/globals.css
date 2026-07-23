@@ -668,6 +668,14 @@ main.diary {
   color: var(--text);
 }
 
+.podcast-spotlight-header h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  font-weight: 600;
+  margin: 0.35rem 0 0.75rem;
+  color: var(--text);
+}
+
 .podcast-spotlight-lede {
   font-size: 0.98rem;
   line-height: 1.75;
@@ -701,7 +709,7 @@ main.diary {
   font-size: 1.2rem;
   line-height: 1.35;
   margin: 0;
-  color: #f7f3ff;
+  color: var(--text);
 }
 
 .podcast-spotlight-latest-title a {
@@ -2770,12 +2778,4 @@ main.diary {
 
 .marketing-page-secondary-links a:hover {
   text-decoration: underline;
-}
-
-.podcast-spotlight-header h1 {
-  font-family: var(--font-serif);
-  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
-  font-weight: 600;
-  margin: 0.35rem 0 0.75rem;
-  color: #f7f3ff;
 }
