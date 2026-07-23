@@ -3,8 +3,8 @@ import {
   getPodcastPlayerEmbed,
 } from "@/lib/podcastFeed";
 
-const SHOW_TITLE = "Soma Studios: The Dream Experiment";
-const SHOW_DESCRIPTION =
+export const PODCAST_SHOW_TITLE = "Soma Studios: The Dream Experiment";
+export const PODCAST_SHOW_DESCRIPTION =
   "AI dream analysis, out loud. Each episode takes a real dream, unpacks it with Freudian thinking, then reshapes it into a genre story and a choose-your-own journey.";
 
 function formatEpisodeDate(iso: string): string {
@@ -18,24 +18,34 @@ function formatEpisodeDate(iso: string): string {
   });
 }
 
-export default async function PodcastSpotlight() {
+type Props = {
+  /** Use h1 on dedicated podcast page; h2 on the homepage section. */
+  titleAs?: "h1" | "h2";
+  sectionId?: string;
+};
+
+export default async function PodcastSpotlight({
+  titleAs = "h2",
+  sectionId = "podcast",
+}: Props) {
   const spotifyUrl = getPodcastChannelUrl();
   const { embedSrc, episode } = await getPodcastPlayerEmbed();
   const episodeDate = episode?.publishedAt
     ? formatEpisodeDate(episode.publishedAt)
     : "";
+  const TitleTag = titleAs;
 
   return (
     <section
-      id="podcast"
+      id={sectionId || undefined}
       className="info-section info-section--alt podcast-spotlight-section"
       aria-labelledby="podcast-spotlight-heading"
     >
       <div className="podcast-spotlight-inner">
         <header className="podcast-spotlight-header">
-          <span className="podcast-kicker">Podcast</span>
-          <h2 id="podcast-spotlight-heading">{SHOW_TITLE}</h2>
-          <p className="podcast-spotlight-lede">{SHOW_DESCRIPTION}</p>
+          <span className="podcast-kicker">Dream analysis podcast</span>
+          <TitleTag id="podcast-spotlight-heading">{PODCAST_SHOW_TITLE}</TitleTag>
+          <p className="podcast-spotlight-lede">{PODCAST_SHOW_DESCRIPTION}</p>
         </header>
 
         <article className="podcast-spotlight-card">
@@ -69,7 +79,7 @@ export default async function PodcastSpotlight() {
                 title={
                   episode
                     ? `${episode.title} on Spotify`
-                    : `${SHOW_TITLE} on Spotify`
+                    : `${PODCAST_SHOW_TITLE} on Spotify`
                 }
                 src={embedSrc}
                 width="100%"

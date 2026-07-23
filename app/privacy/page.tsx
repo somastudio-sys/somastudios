@@ -14,7 +14,7 @@ export default function PrivacyPage() {
   return (
     <>
       <header className="site-header site-header--page">
-        <SiteNav variant="inner" />
+        <SiteNav />
       </header>
       <main className="legal-page">
         <div className="legal-page-inner">

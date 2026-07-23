@@ -10,13 +10,13 @@ type Props = {
 
 export default function BlogShell({
   children,
-  backHref = "/blog",
-  backLabel = "← Journal",
+  backHref = "/dream-journal",
+  backLabel = "← Dream journal",
 }: Props) {
   return (
     <div className="marketing-blog">
       <header className="site-header site-header--page">
-        <SiteNav variant="inner" />
+        <SiteNav />
       </header>
       {backHref ? (
         <p className="blog-article-back-wrap">

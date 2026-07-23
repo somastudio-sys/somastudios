@@ -1,13 +1,15 @@
-# Soma blog posts
+# Soma dream journal posts
 
 Add one Markdown file per post in this folder.
 
 ## Quick start
 
-1. Copy `_template.md` to a new file, e.g. `my-first-post.md`
-2. The filename becomes the URL: `/blog/my-first-post`
+1. Copy `_template.md` to a new file, e.g. `what-is-dream-analysis.md`
+2. The filename becomes the URL: `/dream-journal/what-is-dream-analysis`
 3. Fill in the frontmatter (`title`, `date`, `excerpt`) and write the body in Markdown
-4. Save — the post appears on `/blog` after refresh or redeploy
+4. Save — the post appears on `/dream-journal` after refresh or redeploy
+
+Old `/blog/...` URLs permanently redirect to `/dream-journal/...`.
 
 ## Frontmatter
 

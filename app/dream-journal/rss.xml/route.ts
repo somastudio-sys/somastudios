@@ -17,7 +17,7 @@ export async function GET() {
 
   const items = posts
     .map((post) => {
-      const url = `${base}/blog/${post.slug}`;
+      const url = `${base}/dream-journal/${post.slug}`;
       return `    <item>
       <title>${escapeXml(post.title)}</title>
       <link>${url}</link>
@@ -31,9 +31,9 @@ export async function GET() {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Soma Studios Journal</title>
-    <link>${base}/blog</link>
-    <description>Ideas and updates from Soma Studios.</description>
+    <title>Soma Studios Dream Journal</title>
+    <link>${base}/dream-journal</link>
+    <description>Articles on AI dream analysis and Freudian dream interpretation from Soma Studios.</description>
     <language>en</language>
 ${items}
   </channel>

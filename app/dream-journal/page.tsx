@@ -4,22 +4,32 @@ import BlogShell from "@/components/BlogShell";
 import { getAllPosts } from "@/lib/blog";
 
 export const metadata: Metadata = {
-  title: "Journal",
+  title: "Dream Journal Blog",
   description:
-    "Ideas and updates from Soma Studios—dreams, creativity, and building a softer home for what you see at night.",
+    "Articles on AI dream analysis, Freudian dream interpretation, and keeping a private dream journal — from Soma Studios.",
+  alternates: {
+    canonical: "/dream-journal",
+  },
+  openGraph: {
+    title: "Dream Journal Blog | Soma Studios",
+    description:
+      "Ideas on dreams, Freudian analysis, and building a private AI dream diary.",
+    url: "/dream-journal",
+  },
 };
 
-export default function BlogPage() {
+export default function DreamJournalPage() {
   const posts = getAllPosts();
 
   return (
     <BlogShell backHref="/" backLabel="← Home">
       <header className="marketing-blog-hero">
         <div className="marketing-blog-hero-inner">
-          <h1 className="marketing-blog-h1">Journal</h1>
+          <h1 className="marketing-blog-h1">Dream journal</h1>
           <p className="marketing-blog-dek">
-            Ideas, updates, and how we think about dreams and creativity—so you
-            can see what Soma stands for before you open the diary.
+            Writing on AI dream analysis, Freudian interpretation, and how to keep
+            a private dream diary — so you can see what Soma stands for before you
+            open the app.
           </p>
         </div>
       </header>
@@ -27,10 +37,12 @@ export default function BlogPage() {
       <main className="marketing-blog-main">
         {posts.length === 0 ? (
           <div className="blog-empty">
-            <p>No posts yet.</p>
+            <p>New dream journal articles are on the way.</p>
             <p className="blog-empty-hint">
-              Add a <code>.md</code> file to <code>content/blog/</code> — see{" "}
-              <code>content/blog/README.md</code> for instructions.
+              Meanwhile, try the{" "}
+              <Link href="/ai-dream-analysis">AI dream analysis app</Link> or
+              listen to the{" "}
+              <Link href="/dream-analysis-podcast">dream analysis podcast</Link>.
             </p>
           </div>
         ) : (
@@ -46,14 +58,18 @@ export default function BlogPage() {
                       {post.date}
                     </time>
                     <h2>
-                      <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                      <Link href={`/dream-journal/${post.slug}`}>
+                        {post.title}
+                      </Link>
                     </h2>
                     {post.excerpt ? (
                       <p className="marketing-post-excerpt">{post.excerpt}</p>
                     ) : null}
                   </header>
                   <p className="blog-index-read-more">
-                    <Link href={`/blog/${post.slug}`}>Read article →</Link>
+                    <Link href={`/dream-journal/${post.slug}`}>
+                      Read article →
+                    </Link>
                   </p>
                 </article>
               </li>
@@ -62,8 +78,8 @@ export default function BlogPage() {
         )}
 
         <p className="marketing-blog-cta">
-          <Link href="/login" className="btn btn-primary">
-            Log in to diary
+          <Link href="/signup" className="btn btn-primary">
+            Start your dream journal
           </Link>
         </p>
       </main>

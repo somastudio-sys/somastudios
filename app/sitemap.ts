@@ -8,13 +8,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const paths: { path: string; priority: number; lastModified?: Date }[] = [
     { path: "", priority: 1 },
-    { path: "/blog", priority: 0.85 },
-    { path: "/privacy", priority: 0.6 },
-    { path: "/terms", priority: 0.6 },
+    { path: "/ai-dream-analysis", priority: 0.9 },
+    { path: "/dream-analysis-podcast", priority: 0.9 },
+    { path: "/dream-journal", priority: 0.85 },
+    { path: "/privacy", priority: 0.4 },
+    { path: "/terms", priority: 0.4 },
   ];
 
   const posts = getAllPosts().map((post) => ({
-    path: `/blog/${post.slug}`,
+    path: `/dream-journal/${post.slug}`,
     priority: 0.75,
     lastModified: new Date(post.publishedAt),
   }));
@@ -22,7 +24,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [...paths, ...posts].map(({ path, priority, lastModified }) => ({
     url: `${base}${path}`,
     lastModified: lastModified ?? new Date(),
-    changeFrequency: "monthly" as const,
+    changeFrequency: "weekly" as const,
     priority,
   }));
 }

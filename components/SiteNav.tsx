@@ -1,14 +1,6 @@
 import Link from "next/link";
 
-export type SiteNavVariant = "home" | "inner";
-
-type Props = {
-  variant?: SiteNavVariant;
-};
-
-export default function SiteNav({ variant = "inner" }: Props) {
-  const hash = (id: string) => (variant === "home" ? `#${id}` : `/#${id}`);
-
+export default function SiteNav() {
   return (
     <div className="nav-bar">
       <div className="nav-bar-start">
@@ -20,9 +12,9 @@ export default function SiteNav({ variant = "inner" }: Props) {
           />
         </Link>
         <nav className="nav-links" aria-label="Primary">
-          <a href={hash("products")}>Product</a>
-          <a href={hash("podcast")}>Podcast</a>
-          <Link href="/blog">Blog</Link>
+          <Link href="/ai-dream-analysis">AI dream analysis</Link>
+          <Link href="/dream-analysis-podcast">Podcast</Link>
+          <Link href="/dream-journal">Dream journal</Link>
         </nav>
       </div>
       <div className="nav-cta-group">

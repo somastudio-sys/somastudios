@@ -18,7 +18,7 @@ export default function ForgotPasswordPage() {
   return (
     <>
       <header className="site-header site-header--page">
-        <SiteNav variant="inner" />
+        <SiteNav />
       </header>
       <div
         className="login-body"

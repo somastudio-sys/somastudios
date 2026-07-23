@@ -2689,3 +2689,93 @@ main.diary {
     justify-content: center;
   }
 }
+
+/* SEO marketing pages */
+.marketing-page-intro {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 2rem var(--page-pad) 0.5rem;
+}
+
+.marketing-page-breadcrumb {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+.marketing-page-breadcrumb a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.marketing-page-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.marketing-page-h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 600;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+
+.marketing-page-lede {
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+.marketing-page-outro {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 2.5rem var(--page-pad) 4rem;
+  text-align: center;
+}
+
+.marketing-page-outro h2 {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+
+.marketing-page-outro > p {
+  max-width: 36rem;
+  margin: 0 auto 1.5rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.marketing-page-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin: 0 0 1.25rem;
+}
+
+.marketing-page-secondary-links {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.marketing-page-secondary-links a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.marketing-page-secondary-links a:hover {
+  text-decoration: underline;
+}
+
+.podcast-spotlight-header h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  font-weight: 600;
+  margin: 0.35rem 0 0.75rem;
+  color: #f7f3ff;
+}
