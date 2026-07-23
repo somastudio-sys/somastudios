@@ -685,11 +685,12 @@ main.diary {
 }
 
 .podcast-spotlight-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: #12081f;
+  border: 1px solid rgba(126, 103, 196, 0.45);
   border-radius: calc(var(--radius) + 6px);
-  box-shadow: var(--shadow);
+  box-shadow: 0 18px 45px rgba(15, 10, 40, 0.28);
   padding: 1.35rem 1.35rem 1.5rem;
+  color: #f7f3ff;
 }
 
 .podcast-spotlight-latest {
@@ -709,7 +710,7 @@ main.diary {
   font-size: 1.2rem;
   line-height: 1.35;
   margin: 0;
-  color: var(--text);
+  color: #f7f3ff;
 }
 
 .podcast-spotlight-latest-title a {
@@ -718,19 +719,19 @@ main.diary {
 }
 
 .podcast-spotlight-latest-title a:hover {
-  color: var(--accent);
+  color: #e4c8f5;
 }
 
 .podcast-spotlight-latest-date {
   margin: 0.35rem 0 0;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: rgba(214, 205, 245, 0.75);
 }
 
 .podcast-spotlight-embed-wrap {
   border-radius: var(--radius);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 1px solid rgba(126, 103, 196, 0.35);
   background: #121212;
   margin-bottom: 1.25rem;
 }
@@ -757,7 +758,7 @@ main.diary {
   margin: 1rem 0 0;
   font-size: 0.88rem;
   line-height: 1.55;
-  color: var(--text-muted);
+  color: rgba(214, 205, 245, 0.78);
 }
 
 .testimonials-section {

@@ -62,11 +62,11 @@ export function parseSpotifyEpisodeId(value: string): string | null {
 }
 
 export function spotifyShowEmbedSrc(showId: string): string {
-  return `https://open.spotify.com/embed/show/${showId}?utm_source=generator`;
+  return `https://open.spotify.com/embed/show/${showId}?utm_source=generator&theme=0`;
 }
 
 export function spotifyEpisodeEmbedSrc(episodeId: string): string {
-  return `https://open.spotify.com/embed/episode/${episodeId}?utm_source=generator`;
+  return `https://open.spotify.com/embed/episode/${episodeId}?utm_source=generator&theme=0`;
 }
 
 export function spotifyEmbedSrc(channelUrl: string): string | null {
@@ -106,16 +106,27 @@ function episodeIdFromRssItem(item: {
   return null;
 }
 
-async function fetchLatestSpotifyEpisodeIdFromShowEmbed(
+async function fetchLatestSpotifyEpisodeFromShowEmbed(
   showId: string
-): Promise<string | null> {
+): Promise<{ id: string; title: string } | null> {
   try {
     const res = await fetch(spotifyShowEmbedSrc(showId), {
       next: { revalidate: 3600 },
     });
     if (!res.ok) return null;
     const html = await res.text();
-    return parseSpotifyEpisodeId(html);
+    const id = parseSpotifyEpisodeId(html);
+    if (!id) return null;
+    const nameMatch = html.match(/"name":"((?:\\.|[^"\\]){3,200})"/);
+    const title = nameMatch
+      ? nameMatch[1]
+          .replace(/\\"/g, '"')
+          .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) =>
+            String.fromCharCode(parseInt(hex, 16))
+          )
+          .trim()
+      : "Latest episode";
+    return { id, title };
   } catch {
     return null;
   }
@@ -138,7 +149,8 @@ export async function fetchLatestPodcastEpisode(): Promise<LatestPodcastEpisode 
       if (latest) {
         let spotifyEpisodeId = episodeIdFromRssItem(latest);
         if (!spotifyEpisodeId && showId) {
-          spotifyEpisodeId = await fetchLatestSpotifyEpisodeIdFromShowEmbed(showId);
+          const fromSpotify = await fetchLatestSpotifyEpisodeFromShowEmbed(showId);
+          spotifyEpisodeId = fromSpotify?.id ?? null;
         }
         return {
           title: latest.title?.trim() || "Latest episode",
@@ -154,14 +166,14 @@ export async function fetchLatestPodcastEpisode(): Promise<LatestPodcastEpisode 
 
   if (!showId) return null;
 
-  const spotifyEpisodeId = await fetchLatestSpotifyEpisodeIdFromShowEmbed(showId);
-  if (!spotifyEpisodeId) return null;
+  const fromSpotify = await fetchLatestSpotifyEpisodeFromShowEmbed(showId);
+  if (!fromSpotify) return null;
 
   return {
-    title: "Latest episode",
+    title: fromSpotify.title,
     publishedAt: "",
-    spotifyEpisodeId,
-    link: `https://open.spotify.com/episode/${spotifyEpisodeId}`,
+    spotifyEpisodeId: fromSpotify.id,
+    link: `https://open.spotify.com/episode/${fromSpotify.id}`,
   };
 }
 
