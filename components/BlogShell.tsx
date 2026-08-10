@@ -10,8 +10,8 @@ type Props = {
 
 export default function BlogShell({
   children,
-  backHref = "/dream-journal",
-  backLabel = "← Dream journal",
+  backHref,
+  backLabel = "← Blog",
 }: Props) {
   return (
     <div className="marketing-blog">

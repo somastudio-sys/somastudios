@@ -13,7 +13,7 @@ export default function SiteFooter() {
           <Link href="/">Home</Link>
           <Link href="/ai-dream-analysis">AI dream analysis</Link>
           <Link href="/dream-analysis-podcast">Podcast</Link>
-          <Link href="/dream-journal">Dream journal</Link>
+          <Link href="/blog">Blog</Link>
           <Link href="/login">Log in</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>

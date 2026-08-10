@@ -10,6 +10,9 @@ export type BlogPostMeta = {
   date: string;
   excerpt: string;
   publishedAt: string;
+  category: string;
+  image: string | null;
+  imageAlt: string;
 };
 
 export type BlogPost = BlogPostMeta & {
@@ -49,6 +52,18 @@ function parseFile(filename: string): BlogPost | null {
   const dateRaw = typeof data.date === "string" ? data.date.trim() : "";
   const excerpt =
     typeof data.excerpt === "string" ? data.excerpt.trim() : "";
+  const category =
+    typeof data.category === "string" && data.category.trim()
+      ? data.category.trim()
+      : "Article";
+  const image =
+    typeof data.image === "string" && data.image.trim()
+      ? data.image.trim()
+      : null;
+  const imageAlt =
+    typeof data.imageAlt === "string" && data.imageAlt.trim()
+      ? data.imageAlt.trim()
+      : title;
 
   if (!title || !dateRaw) return null;
 
@@ -60,7 +75,32 @@ function parseFile(filename: string): BlogPost | null {
     date: display,
     excerpt,
     publishedAt: iso,
+    category,
+    image,
+    imageAlt,
     content: content.trim(),
+  };
+}
+
+function toMeta({
+  slug,
+  title,
+  date,
+  excerpt,
+  publishedAt,
+  category,
+  image,
+  imageAlt,
+}: BlogPost): BlogPostMeta {
+  return {
+    slug,
+    title,
+    date,
+    excerpt,
+    publishedAt,
+    category,
+    image,
+    imageAlt,
   };
 }
 
@@ -72,13 +112,7 @@ export function getAllPosts(): BlogPostMeta[] {
     .filter(isPostFile)
     .map((file) => parseFile(file))
     .filter((post): post is BlogPost => post !== null)
-    .map(({ slug, title, date, excerpt, publishedAt }) => ({
-      slug,
-      title,
-      date,
-      excerpt,
-      publishedAt,
-    }))
+    .map(toMeta)
     .sort(
       (a, b) =>
         new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()

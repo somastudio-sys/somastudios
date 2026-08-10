@@ -4,18 +4,18 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/blog",
-        destination: "/dream-journal",
+        source: "/dream-journal",
+        destination: "/blog",
         permanent: true,
       },
       {
-        source: "/blog/:slug",
-        destination: "/dream-journal/:slug",
+        source: "/dream-journal/:slug",
+        destination: "/blog/:slug",
         permanent: true,
       },
       {
-        source: "/blog/rss.xml",
-        destination: "/dream-journal/rss.xml",
+        source: "/dream-journal/rss.xml",
+        destination: "/blog/rss.xml",
         permanent: true,
       },
     ];

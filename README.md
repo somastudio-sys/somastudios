@@ -41,7 +41,7 @@ Optional: set `OPENAI_MODEL` to another chat model if your account supports it. 
 
 **Story journey:** After you run **Analyse (Freud)** on a dream, use **Story journey** to pick a genre and build a choose-your-path short story from the dream and analysis (same `OPENAI_API_KEY`, `POST /api/story`).
 
-**Public journal (`/dream-journal`):** Markdown posts in `content/blog/` — copy `_template.md`, add a new `.md` file, deploy. RSS at `/dream-journal/rss.xml`. Old `/blog` URLs redirect here.
+**Public blog (`/blog`):** Markdown posts in `content/blog/` — copy `_template.md`, add a new `.md` file, deploy. RSS at `/blog/rss.xml`. Old `/dream-journal` URLs redirect here.
 
 **SEO pages:** `/ai-dream-analysis` (product), `/dream-analysis-podcast` (podcast).
 

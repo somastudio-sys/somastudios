@@ -53,7 +53,7 @@ export default function AiDreamAnalysisPage() {
         <p className="marketing-page-secondary-links">
           <Link href="/dream-analysis-podcast">Listen to the dream analysis podcast</Link>
           <span aria-hidden="true"> · </span>
-          <Link href="/dream-journal">Read the dream journal</Link>
+          <Link href="/blog">Read the blog</Link>
         </p>
       </div>
     </MarketingPageShell>

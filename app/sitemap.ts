@@ -10,13 +10,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "", priority: 1 },
     { path: "/ai-dream-analysis", priority: 0.9 },
     { path: "/dream-analysis-podcast", priority: 0.9 },
-    { path: "/dream-journal", priority: 0.85 },
+    { path: "/blog", priority: 0.85 },
     { path: "/privacy", priority: 0.4 },
     { path: "/terms", priority: 0.4 },
   ];
 
   const posts = getAllPosts().map((post) => ({
-    path: `/dream-journal/${post.slug}`,
+    path: `/blog/${post.slug}`,
     priority: 0.75,
     lastModified: new Date(post.publishedAt),
   }));

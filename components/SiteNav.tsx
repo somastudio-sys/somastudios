@@ -14,7 +14,7 @@ export default function SiteNav() {
         <nav className="nav-links" aria-label="Primary">
           <Link href="/ai-dream-analysis">AI dream analysis</Link>
           <Link href="/dream-analysis-podcast">Podcast</Link>
-          <Link href="/dream-journal">Dream journal</Link>
+          <Link href="/blog">Blog</Link>
         </nav>
       </div>
       <div className="nav-cta-group">
