@@ -6,16 +6,20 @@ import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
 
 export const metadata: Metadata = {
-  title: "AI Dream Analysis App & Dream Journal",
+  title: {
+    absolute:
+      "Dream Journal App | Dream Analysis and Interpretation | Soma Studios",
+  },
   description:
-    "Soma Studios is an AI dream journal that analyses your dreams through a Freudian lens — then lets you build them into branching stories you navigate yourself.",
+    "Soma Studios combines AI dream journaling and Freudian dream interpretation with interactive storytelling. Transform your dreams into genre-based adventures, choose your next move, and create a story only you could imagine.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Soma Studios — AI Dream Analysis App",
+    title:
+      "Dream Journal App | Dream Analysis and Interpretation | Soma Studios",
     description:
-      "The only dream diary that tells you what it means. Freudian AI analysis, story journeys, private archive.",
+      "Soma Studios combines AI dream journaling and Freudian dream interpretation with interactive storytelling. Transform your dreams into genre-based adventures, choose your next move, and create a story only you could imagine.",
     url: "/",
   },
 };
@@ -33,7 +37,7 @@ export default function Home() {
               The AI dream analysis app · Dream journal
             </span>
             <h1 className="hero-title">
-              The only dream diary that tells you what it means.
+              AI Dream Journal & Interactive Dream Interpretation
             </h1>
             <p className="hero-subtitle">
               Soma Studios is an AI dream journal that analyses your dreams
