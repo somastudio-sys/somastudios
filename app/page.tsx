@@ -37,7 +37,7 @@ export default function Home() {
               The AI dream analysis app · Dream journal
             </span>
             <h1 className="hero-title">
-              The only dream diary that tells you what it means.
+              AI Dream Journal & Interactive Dream Interpretation
             </h1>
             <p className="hero-subtitle">
               Soma Studios is an AI dream journal that analyses your dreams
