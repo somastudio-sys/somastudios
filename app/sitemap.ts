@@ -9,6 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const paths: { path: string; priority: number; lastModified?: Date }[] = [
     { path: "", priority: 1 },
     { path: "/ai-dream-analysis", priority: 0.9 },
+    { path: "/product/dream-journal", priority: 0.9 },
     { path: "/dream-analysis-podcast", priority: 0.9 },
     { path: "/blog", priority: 0.85 },
     { path: "/privacy", priority: 0.4 },

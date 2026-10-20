@@ -1,4 +1,4 @@
-type ProductCard = {
+export type ProductCard = {
   image: string;
   imageAlt: string;
   label: string;
@@ -45,6 +45,7 @@ type Props = {
   tagline?: string;
   headingId?: string;
   sectionId?: string;
+  products?: ProductCard[];
 };
 
 export default function ProductFeatures({
@@ -52,6 +53,7 @@ export default function ProductFeatures({
   tagline = "AI dream analysis, Freudian interpretation, choose-your-path story journeys, and a private archive — four features, one place, nothing leaves your browser.",
   headingId,
   sectionId = "products",
+  products = PRODUCTS,
 }: Props) {
   return (
     <section id={sectionId || undefined} className="product-section">
@@ -64,7 +66,7 @@ export default function ProductFeatures({
           className="product-carousel"
           aria-label="Soma product preview carousel"
         >
-          {PRODUCTS.map((product) => (
+          {products.map((product) => (
             <figure key={product.label} className="product-card">
               <div className="product-image-frame product-image-moment">
                 <img src={product.image} alt={product.imageAlt} />

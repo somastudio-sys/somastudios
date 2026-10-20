@@ -3249,3 +3249,149 @@ main.diary {
 .marketing-page-secondary-links a:hover {
   text-decoration: underline;
 }
+
+/* Product landing: how it works + FAQ */
+.how-inner {
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+#how-it-works .how-inner {
+  text-align: center;
+}
+
+#how-it-works .how-steps {
+  text-align: left;
+}
+
+.how-inner > h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 3vw, 2.2rem);
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+  color: var(--text);
+}
+
+.how-steps {
+  list-style: none;
+  counter-reset: how-step;
+  margin: 2rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.how-steps li {
+  counter-increment: how-step;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  padding: 1.35rem 1.3rem 1.5rem;
+}
+
+.how-steps li::before {
+  content: counter(how-step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  margin-bottom: 0.85rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.how-steps h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.how-steps p {
+  margin: 0;
+}
+
+.how-cta {
+  display: flex;
+  justify-content: center;
+  margin: 2.25rem 0 0;
+}
+
+.info-section .how-cta {
+  margin-top: 2.25rem;
+}
+
+.how-cta .btn {
+  text-decoration: none;
+}
+
+.product-faq {
+  max-width: 40rem;
+  margin: 1.5rem auto 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.product-faq details {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0;
+}
+
+.product-faq summary {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  cursor: pointer;
+  padding: 1rem 1.2rem;
+  list-style: none;
+}
+
+.product-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.product-faq summary::after {
+  content: "+";
+  float: right;
+  color: var(--accent);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.product-faq details[open] summary::after {
+  content: "–";
+}
+
+.product-faq details p {
+  padding: 0 1.2rem 1.1rem;
+  margin: 0;
+}
+
+#faq .how-inner > h2,
+#faq .info-inner > h2 {
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .how-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
