@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PodcastSpotlight from "@/components/PodcastSpotlight";
+import ProductFeatures from "@/components/ProductFeatures";
 import SiteFooter from "@/components/SiteFooter";
 import SiteNav from "@/components/SiteNav";
 
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
       "Dream Journal App | Dream Analysis and Interpretation | Soma Studios",
   },
   description:
-    "Soma Studios is an AI dream journal that analyses your dreams through a Freudian lens — then lets you build them into branching stories you navigate yourself.",
+    "Soma Studios combines AI dream journaling and Freudian dream interpretation with interactive storytelling. Transform your dreams into genre-based adventures, choose your next move, and create a story only you could imagine.",
   alternates: {
     canonical: "/",
   },
@@ -17,10 +19,12 @@ export const metadata: Metadata = {
     title:
       "Dream Journal App | Dream Analysis and Interpretation | Soma Studios",
     description:
-      "Soma Studios is an AI dream journal that analyses your dreams through a Freudian lens — then lets you build them into branching stories you navigate yourself.",
+      "Soma Studios combines AI dream journaling and Freudian dream interpretation with interactive storytelling. Transform your dreams into genre-based adventures, choose your next move, and create a story only you could imagine.",
     url: "/",
   },
 };
+
+export const revalidate = 3600;
 
 export default function Home() {
   return (
@@ -29,22 +33,27 @@ export default function Home() {
         <SiteNav />
         <section className="hero">
           <div className="hero-copy">
-            <h1 className="hero-title">Soma Studios</h1>
+            <span className="hero-kicker">
+              The AI dream analysis app · Dream journal
+            </span>
+            <h1 className="hero-title">
+              AI Dream Journal & Interactive Dream Interpretation
+            </h1>
             <p className="hero-subtitle">
-              An AI dream journal that analyses your dreams through a Freudian
-              lens — then lets you turn them into branching stories you navigate
-              yourself.
+              Soma Studios is an AI dream journal that analyses your dreams
+              through a Freudian lens — then lets you build them into branching
+              stories you navigate yourself. Private, in your browser.
             </p>
             <div className="hero-actions">
-              <Link href="/signup" className="btn btn-primary hero-primary">
-                Sign up
+              <Link href="/login" className="btn btn-primary hero-primary">
+                Log in to diary
               </Link>
-              <Link href="/login" className="btn btn-ghost hero-secondary">
-                Log in
+              <Link href="#podcast" className="btn btn-ghost hero-secondary">
+                Dream analysis podcast
               </Link>
             </div>
             <p className="hero-meta">
-              Password-protected diary · Private by default
+              Password-protected diary · Runs in your browser · Private by default
             </p>
           </div>
           <div className="hero-visual" aria-hidden="true">
@@ -58,7 +67,7 @@ export default function Home() {
                 <div className="hero-window-placeholder">
                   <img
                     src="/assets/hero-diary-preview.png"
-                    alt=""
+                    alt="Soma dream diary: date, title, dream text, record, save and clear"
                     className="hero-window-image"
                   />
                 </div>
@@ -67,6 +76,10 @@ export default function Home() {
           </div>
         </section>
       </header>
+
+      <ProductFeatures />
+
+      <PodcastSpotlight />
 
       <SiteFooter />
 
