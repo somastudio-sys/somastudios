@@ -11,16 +11,14 @@ export default function SiteFooter() {
         <p className="site-footer-brand">Soma Studios</p>
         <nav className="site-footer-nav" aria-label="Footer">
           <Link href="/">Home</Link>
-          <Link href="/ai-dream-analysis">AI dream analysis</Link>
-          <Link href="/dream-analysis-podcast">Podcast</Link>
-          <Link href="/blog">Blog</Link>
+          <Link href="/signup">Sign up</Link>
           <Link href="/login">Log in</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
           {contact ? <a href={`mailto:${contact}`}>Contact</a> : null}
         </nav>
         <p className="site-footer-copy">
-          © {year} Soma Studios. Dream diary in your browser—private by default.
+          © {year} Soma Studios. Dream diary—private by default.
         </p>
       </div>
     </footer>

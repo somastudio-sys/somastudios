@@ -3250,108 +3250,237 @@ main.diary {
   text-decoration: underline;
 }
 
-/* Product landing: how it works + FAQ */
-.how-inner {
-  max-width: var(--page-max);
+/* Dream journal product landing (Penzu-style structure, Soma colour) */
+.journal-wrap {
+  width: 100%;
+  max-width: 1080px;
   margin: 0 auto;
+  padding: 0 var(--page-pad);
 }
 
-#how-it-works .how-inner {
+.journal-wrap--copy {
+  max-width: 40rem;
   text-align: center;
 }
 
-#how-it-works .how-steps {
-  text-align: left;
+.journal-hero {
+  text-align: center;
+  padding: 4.5rem var(--page-pad) 3.5rem;
 }
 
-.how-inner > h2 {
-  font-family: var(--font-serif);
-  font-size: clamp(1.75rem, 3vw, 2.2rem);
-  font-weight: 600;
-  margin: 0 0 0.35rem;
-  color: var(--text);
-}
-
-.how-steps {
-  list-style: none;
-  counter-reset: how-step;
-  margin: 2rem 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
-  align-items: stretch;
-}
-
-.how-steps li {
-  counter-increment: how-step;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  padding: 1.35rem 1.3rem 1.5rem;
-}
-
-.how-steps li::before {
-  content: counter(how-step);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.1rem;
-  height: 2.1rem;
-  margin-bottom: 0.85rem;
+.journal-badge {
+  display: inline-block;
+  margin: 0 0 1.1rem;
+  padding: 0.28rem 0.75rem;
   border-radius: 999px;
   background: var(--accent-soft);
   color: var(--accent);
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.how-steps h3 {
+.journal-hero h1 {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: clamp(2.35rem, 5vw, 3.55rem);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  max-width: 14em;
+  margin: 0 auto 1rem;
+  color: var(--text);
+}
+
+.journal-hero h1 em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.journal-lede {
+  max-width: 32rem;
+  margin: 0 auto 1.75rem;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.journal-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.journal-cta .btn {
+  text-decoration: none;
+}
+
+.journal-trust {
+  margin: 0 0 2rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.journal-hero-shot {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.journal-hero-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  background: var(--bg-card);
+}
+
+.journal-band {
+  padding: 4.5rem 0;
+}
+
+#how-it-works {
+  background: var(--bg-card);
+}
+
+.journal-band h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 3.5vw, 2.55rem);
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+
+.journal-band p,
+.journal-feature-grid p,
+.journal-steps p,
+.journal-faq p,
+.journal-privacy-card p,
+.journal-final p {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+.journal-band--grid {
+  background: #ece6f8;
+}
+
+.journal-feature-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.journal-feature-grid li {
+  padding: 1.75rem 1.5rem 1.65rem;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.journal-feature-grid h3 {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
   margin: 0 0 0.5rem;
   color: var(--text);
 }
 
-.how-steps p {
+.journal-feature-grid p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.journal-band--privacy {
+  background: var(--bg-deep);
+  padding: 3.5rem var(--page-pad);
+}
+
+.journal-privacy-card {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 2.25rem 2rem;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.journal-privacy-card h2 {
+  margin-bottom: 0.65rem;
+}
+
+.journal-privacy-card p {
   margin: 0;
 }
 
-.how-cta {
-  display: flex;
-  justify-content: center;
-  margin: 2.25rem 0 0;
+.journal-steps {
+  list-style: none;
+  margin: 2.5rem auto 0;
+  padding: 0 var(--page-pad);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  text-align: left;
 }
 
-.info-section .how-cta {
-  margin-top: 2.25rem;
+.journal-step-num {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent);
 }
 
-.how-cta .btn {
-  text-decoration: none;
+.journal-steps h3 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 0.45rem;
+  color: var(--text);
 }
 
-.product-faq {
+.journal-steps p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.journal-band--faq {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+}
+
+.journal-faq {
   max-width: 40rem;
   margin: 1.5rem auto 0;
   display: grid;
   gap: 0.75rem;
 }
 
-.product-faq details {
-  background: var(--bg-card);
+.journal-faq details {
+  background: var(--bg-deep);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 0;
 }
 
-.product-faq summary {
+.journal-faq summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
   font-family: var(--font-serif);
   font-size: 1.15rem;
   font-weight: 600;
@@ -3362,36 +3491,56 @@ main.diary {
   list-style: none;
 }
 
-.product-faq summary::-webkit-details-marker {
+.journal-faq summary::-webkit-details-marker {
   display: none;
 }
 
-.product-faq summary::after {
+.journal-faq summary::after {
   content: "+";
-  float: right;
   color: var(--accent);
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: 1.2rem;
   line-height: 1.2;
+  flex-shrink: 0;
 }
 
-.product-faq details[open] summary::after {
+.journal-faq details[open] summary::after {
   content: "–";
 }
 
-.product-faq details p {
+.journal-faq details p {
   padding: 0 1.2rem 1.1rem;
   margin: 0;
 }
 
-#faq .how-inner > h2,
-#faq .info-inner > h2 {
+.journal-final {
   text-align: center;
+  padding: 5rem var(--page-pad) 4.5rem;
+  background: #e4dcf4;
+}
+
+.journal-final h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 3.5vw, 2.55rem);
+  font-weight: 600;
+  margin: 0 0 0.65rem;
+  color: var(--text);
+}
+
+.journal-final > p {
+  max-width: 32rem;
+  margin: 0 auto 1.5rem;
 }
 
 @media (max-width: 900px) {
-  .how-steps {
+  .journal-hero {
+    padding-top: 3rem;
+  }
+
+  .journal-feature-grid,
+  .journal-steps {
     grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
   }
 }
